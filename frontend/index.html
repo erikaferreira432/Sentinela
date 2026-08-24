@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Sentinela | Sistema Hospitalar</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/
+  css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/css.index/style.css">
+</head>
+
+<body>
+
+  <div class="background">
+    <div class="grid"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+  </div>
+
+  <main class="login-container">
+
+    <!-- PAINEL ESQUERDO -->
+    <section class="brand-panel">
+
+      <div class="brand">
+
+        <div class="brand">
+  <img
+    src="sentinelalogo.png"
+    alt="Sentinela - Sistema Hospitalar"
+    class="sentinela-logo"
+  >
+</div>
+
+      </div>
+
+      <div class="brand-content">
+
+        <div class="status">
+          <span class="status-dot"></span>
+          SISTEMA OPERACIONAL
+        </div>
+
+        <h2>
+          Tecnologia que
+          <span>protege vidas.</span>
+        </h2>
+
+        <p>
+          Plataforma integrada para gerenciamento,
+          triagem e atendimento hospitalar em tempo real.
+        </p>
+
+      </div>
+
+      <div class="system-info">
+        <div>
+          <span>STATUS</span>
+          <strong>ONLINE</strong>
+        </div>
+
+        <div>
+          <span>SEGURANÇA</span>
+          <strong>ATIVA</strong>
+        </div>
+
+        <div>
+          <span>REDE</span>
+          <strong>SEGURA</strong>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- LOGIN -->
+    <section class="login-panel">
+
+      <div class="login-box">
+
+        <div class="login-icon">
+          🔐
+        </div>
+
+        <span class="welcome">ACESSO RESTRITO</span>
+
+        <h2>Bem-vindo</h2>
+
+        <p class="subtitle">
+          Entre com suas credenciais para acessar o sistema.
+        </p>
+
+
+        <form onsubmit="event.preventDefault(); login();">
+
+          <div class="input-group">
+
+            <label for="usuario">IDENTIFICAÇÃO</label>
+
+            <div class="input-wrapper">
+              <span class="input-icon">◉</span>
+
+              <input
+                id="usuario"
+                type="text"
+                placeholder="Digite seu usuário"
+                autocomplete="username"
+              >
+            </div>
+
+          </div>
+
+
+          <div class="input-group">
+
+            <label for="senha">CÓDIGO DE ACESSO</label>
+
+            <div class="input-wrapper">
+              <span class="input-icon">●</span>
+
+              <input
+                id="senha"
+                type="password"
+                placeholder="Digite sua senha"
+                autocomplete="current-password"
+              >
+            </div>
+
+          </div>
+
+
+          <button type="submit" class="login-button">
+
+            <span>ACESSAR SISTEMA</span>
+
+            <span class="arrow">→</span>
+
+          </button>
+
+        </form>
+
+
+        <div class="security">
+
+          <span class="shield">🛡</span>
+
+          <div>
+            <strong>CONEXÃO SEGURA</strong>
+            <small>Seus dados são protegidos pelo sistema Sentinela.</small>
+          </div>
+
+        </div>
+
+      </div>
+
+      <footer>
+        SENTINELA © 2026 · SISTEMA HOSPITALAR
+      </footer>
+
+    </section>
+
+  </main>
+
+
+<script>
+
+function login() {
+
+  const usuario = document.getElementById("usuario").value;
+  const senha = document.getElementById("senha").value;
+
+  fetch("http://localhost:3000/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      usuario: usuario,
+      senha: senha
+    })
+  })
+
+  .then(r => r.json())
+
+  .then(data => {
+
+    if (data.tipo === "triagem")
+      location.href = "triagem.html";
+
+    if (data.tipo === "medico")
+      location.href = "medico.html";
+
+    if (data.tipo === "atendimento")
+      location.href = "atendimento.html";
+
+  })
+
+  .catch(error => {
+
+    console.error("Erro ao conectar com o servidor:", error);
+
+  });
+
+}
+
+</script>
+
+</body>
+</html>

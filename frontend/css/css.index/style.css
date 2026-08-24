@@ -1,0 +1,801 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #030a12;
+  --panel: rgba(8, 20, 32, 0.78);
+  --cyan: #00e5ff;
+  --cyan-dark: #008fa3;
+  --text: #f1fbff;
+  --muted: #78909c;
+  --border: rgba(0, 229, 255, 0.16);
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+
+  font-family: "Inter", sans-serif;
+
+  background: var(--bg);
+  color: var(--text);
+
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   FUNDO
+===================================================== */
+
+.background {
+  position: fixed;
+  inset: 0;
+
+  overflow: hidden;
+
+  z-index: -1;
+
+  background:
+    radial-gradient(
+      circle at 15% 50%,
+      rgba(0, 229, 255, 0.09),
+      transparent 35%
+    ),
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(0, 150, 255, 0.08),
+      transparent 35%
+    ),
+    #030a12;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    linear-gradient(
+      rgba(0, 229, 255, 0.035) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(0, 229, 255, 0.035) 1px,
+      transparent 1px
+    );
+
+  background-size: clamp(35px, 3vw, 55px) clamp(35px, 3vw, 55px);
+
+  mask-image: linear-gradient(
+    to bottom,
+    transparent,
+    black 20%,
+    black 80%,
+    transparent
+  );
+}
+
+.glow {
+  position: absolute;
+
+  border-radius: 50%;
+
+  filter: blur(clamp(70px, 8vw, 120px));
+}
+
+.glow-1 {
+  width: clamp(200px, 25vw, 400px);
+  height: clamp(200px, 25vw, 400px);
+
+  background: rgba(0, 229, 255, 0.07);
+
+  left: -8vw;
+  top: 20%;
+}
+
+.glow-2 {
+  width: clamp(180px, 22vw, 350px);
+  height: clamp(180px, 22vw, 350px);
+
+  background: rgba(0, 119, 255, 0.08);
+
+  right: -6vw;
+  bottom: 10%;
+}
+
+
+/* =====================================================
+   CONTAINER PRINCIPAL
+===================================================== */
+
+.login-container {
+  width: calc(100vw - clamp(20px, 3vw, 60px));
+  height: calc(100vh - clamp(20px, 3vw, 60px));
+
+  max-width: 1600px;
+  max-height: 900px;
+
+  position: fixed;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  display: grid;
+
+  grid-template-columns: 1.08fr 0.92fr;
+
+  border: 1px solid var(--border);
+
+  background: rgba(4, 14, 23, 0.72);
+
+  backdrop-filter: blur(25px);
+
+  box-shadow:
+    0 30px 100px rgba(0, 0, 0, 0.55),
+    0 0 80px rgba(0, 229, 255, 0.04);
+
+  border-radius: clamp(14px, 1.5vw, 24px);
+
+  overflow: hidden;
+}
+
+
+/* =====================================================
+   PAINEL DA MARCA
+===================================================== */
+
+.brand-panel {
+  padding: clamp(30px, 4vw, 70px);
+
+  display: flex;
+
+  flex-direction: column;
+
+  border-right: 1px solid var(--border);
+
+  position: relative;
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(0, 229, 255, 0.045),
+      transparent 50%
+    );
+}
+
+
+/* =====================================================
+   LOGO
+===================================================== */
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.sentinela-logo {
+  width: clamp(150px, 17vw, 280px);
+
+  max-width: 100%;
+
+  height: auto;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 0 clamp(8px, 1vw, 20px)
+      rgba(0, 229, 255, 0.12)
+    );
+
+  transition: 0.3s ease;
+}
+
+.sentinela-logo:hover {
+  filter:
+    drop-shadow(
+      0 0 clamp(12px, 1.5vw, 25px)
+      rgba(0, 229, 255, 0.25)
+    );
+
+  transform: scale(1.02);
+}
+
+
+/* =====================================================
+   CONTEÚDO DA MARCA
+===================================================== */
+
+.brand-content {
+  margin-top: auto;
+  margin-bottom: auto;
+
+  max-width: clamp(380px, 90%, 620px);
+}
+
+.status {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: clamp(6px, 0.6vw, 10px);
+
+  padding:
+    clamp(6px, 0.6vw, 9px)
+    clamp(10px, 0.9vw, 15px);
+
+  border: 1px solid rgba(0, 229, 255, 0.16);
+
+  border-radius: 50px;
+
+  background: rgba(0, 229, 255, 0.035);
+
+  color: #8fa8b5;
+
+  font-size: clamp(8px, 0.65vw, 10px);
+
+  font-weight: 600;
+
+  letter-spacing: clamp(1px, 0.12vw, 1.8px);
+}
+
+.status-dot {
+  width: clamp(6px, 0.45vw, 8px);
+  height: clamp(6px, 0.45vw, 8px);
+
+  flex-shrink: 0;
+
+  background: #00ff9d;
+
+  border-radius: 50%;
+
+  box-shadow: 0 0 12px #00ff9d;
+}
+
+.brand-content h2 {
+  margin-top: clamp(18px, 2vw, 30px);
+
+  font-size: clamp(36px, 4.2vw, 68px);
+
+  line-height: 1.04;
+
+  letter-spacing: clamp(-2px, -0.12vw, -1px);
+}
+
+.brand-content h2 span {
+  display: block;
+
+  color: var(--cyan);
+
+  text-shadow:
+    0 0 30px rgba(0, 229, 255, 0.25);
+}
+
+.brand-content p {
+  margin-top: clamp(18px, 2vw, 30px);
+
+  max-width: clamp(350px, 90%, 500px);
+
+  color: var(--muted);
+
+  font-size: clamp(12px, 0.85vw, 16px);
+
+  line-height: 1.8;
+}
+
+
+/* =====================================================
+   INFORMAÇÕES DO SISTEMA
+===================================================== */
+
+.system-info {
+  display: flex;
+
+  gap: clamp(25px, 4vw, 70px);
+}
+
+.system-info div {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: clamp(4px, 0.4vw, 7px);
+}
+
+.system-info span {
+  font-size: clamp(7px, 0.55vw, 9px);
+
+  letter-spacing: clamp(1px, 0.12vw, 2px);
+
+  color: #506874;
+}
+
+.system-info strong {
+  font-family: "Orbitron", sans-serif;
+
+  font-size: clamp(9px, 0.7vw, 12px);
+
+  letter-spacing: clamp(0.5px, 0.08vw, 1.5px);
+
+  color: #b8d7df;
+}
+
+
+/* =====================================================
+   PAINEL DE LOGIN
+===================================================== */
+
+.login-panel {
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+
+  padding:
+    clamp(30px, 4vw, 70px);
+
+  background: rgba(2, 10, 17, 0.35);
+}
+
+.login-box {
+  width: 100%;
+
+  max-width: clamp(340px, 28vw, 480px);
+
+  margin: auto;
+}
+
+
+/* =====================================================
+   ÍCONE
+===================================================== */
+
+.login-icon {
+  width: clamp(42px, 3.5vw, 58px);
+  height: clamp(42px, 3.5vw, 58px);
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: clamp(10px, 1vw, 15px);
+
+  background: rgba(0, 229, 255, 0.07);
+
+  border: 1px solid rgba(0, 229, 255, 0.15);
+
+  font-size: clamp(16px, 1.3vw, 22px);
+
+  margin-bottom: clamp(16px, 1.8vw, 26px);
+}
+
+
+/* =====================================================
+   TÍTULOS
+===================================================== */
+
+.welcome {
+  font-family: "Orbitron", sans-serif;
+
+  font-size: clamp(8px, 0.65vw, 11px);
+
+  letter-spacing: clamp(1.3px, 0.15vw, 2.5px);
+
+  color: var(--cyan);
+}
+
+.login-box h2 {
+  margin-top: clamp(8px, 0.8vw, 12px);
+
+  font-size: clamp(28px, 2.4vw, 40px);
+
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  margin-top: clamp(8px, 0.8vw, 13px);
+
+  color: var(--muted);
+
+  font-size: clamp(11px, 0.75vw, 14px);
+
+  line-height: 1.6;
+}
+
+
+/* =====================================================
+   FORMULÁRIO
+===================================================== */
+
+form {
+  margin-top: clamp(25px, 2.5vw, 40px);
+}
+
+.input-group {
+  margin-bottom: clamp(15px, 1.4vw, 22px);
+}
+
+.input-group label {
+  display: block;
+
+  margin-bottom: clamp(6px, 0.6vw, 9px);
+
+  font-size: clamp(8px, 0.6vw, 10px);
+
+  font-weight: 700;
+
+  letter-spacing: clamp(1px, 0.12vw, 1.8px);
+
+  color: #78909c;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.input-icon {
+  position: absolute;
+
+  left: clamp(14px, 1.1vw, 18px);
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #52717d;
+
+  font-size: clamp(10px, 0.8vw, 13px);
+
+  transition: 0.3s;
+
+  z-index: 2;
+}
+
+input {
+  width: 100%;
+
+  height: clamp(48px, 4vw, 60px);
+
+  padding:
+    0
+    clamp(14px, 1.2vw, 20px)
+    0
+    clamp(40px, 3vw, 48px);
+
+  border-radius: clamp(9px, 0.8vw, 12px);
+
+  border: 1px solid rgba(120, 144, 156, 0.15);
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.025);
+
+  color: white;
+
+  font-family: "Inter", sans-serif;
+
+  font-size: clamp(12px, 0.8vw, 15px);
+
+  transition: 0.3s;
+}
+
+input::placeholder {
+  color: #40545e;
+}
+
+input:focus {
+  border-color: rgba(0, 229, 255, 0.55);
+
+  background: rgba(0, 229, 255, 0.025);
+
+  box-shadow:
+    0 0 0 3px rgba(0, 229, 255, 0.05),
+    0 0 25px rgba(0, 229, 255, 0.06);
+}
+
+.input-wrapper:focus-within .input-icon {
+  color: var(--cyan);
+
+  text-shadow: 0 0 10px var(--cyan);
+}
+
+
+/* =====================================================
+   BOTÃO
+===================================================== */
+
+.login-button {
+  width: 100%;
+
+  height: clamp(48px, 4vw, 60px);
+
+  margin-top: clamp(3px, 0.4vw, 6px);
+
+  border: none;
+
+  border-radius: clamp(9px, 0.8vw, 12px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #00d9f5,
+      #009bb5
+    );
+
+  color: #001018;
+
+  font-family: "Orbitron", sans-serif;
+
+  font-size: clamp(9px, 0.65vw, 11px);
+
+  font-weight: 700;
+
+  letter-spacing: clamp(1px, 0.12vw, 1.7px);
+
+  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: clamp(10px, 1vw, 16px);
+
+  position: relative;
+
+  overflow: hidden;
+
+  transition: 0.3s;
+
+  box-shadow:
+    0 10px 30px rgba(0, 229, 255, 0.15);
+}
+
+.login-button::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: -100%;
+
+  width: 60%;
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,0.35),
+      transparent
+    );
+
+  transform: skewX(-20deg);
+
+  transition: 0.6s;
+}
+
+.login-button:hover::before {
+  left: 150%;
+}
+
+.login-button:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 15px 40px rgba(0, 229, 255, 0.25);
+}
+
+.arrow {
+  font-size: clamp(17px, 1.5vw, 22px);
+
+  transition: 0.3s;
+}
+
+.login-button:hover .arrow {
+  transform: translateX(5px);
+}
+
+
+/* =====================================================
+   SEGURANÇA
+===================================================== */
+
+.security {
+  display: flex;
+
+  align-items: center;
+
+  gap: clamp(9px, 0.8vw, 13px);
+
+  margin-top: clamp(18px, 2vw, 28px);
+
+  padding: clamp(11px, 1vw, 16px);
+
+  border: 1px solid rgba(0, 229, 255, 0.08);
+
+  border-radius: clamp(8px, 0.7vw, 11px);
+
+  background: rgba(0, 229, 255, 0.025);
+}
+
+.shield {
+  font-size: clamp(15px, 1.2vw, 19px);
+}
+
+.security strong {
+  display: block;
+
+  font-family: "Orbitron", sans-serif;
+
+  font-size: clamp(7px, 0.55vw, 9px);
+
+  letter-spacing: clamp(0.8px, 0.1vw, 1.3px);
+
+  color: #9cb9c2;
+}
+
+.security small {
+  display: block;
+
+  margin-top: 4px;
+
+  font-size: clamp(8px, 0.6vw, 10px);
+
+  color: #506874;
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+  text-align: center;
+
+  font-size: clamp(7px, 0.55vw, 9px);
+
+  letter-spacing: clamp(1px, 0.12vw, 1.7px);
+
+  color: #30454f;
+}
+
+
+/* =====================================================
+   TELAS MENORES
+===================================================== */
+
+@media (max-width: 900px) {
+
+  body {
+    overflow: auto;
+  }
+
+  .login-container {
+    width: 94vw;
+    height: auto;
+    min-height: 94vh;
+
+    position: relative;
+
+    top: auto;
+    left: auto;
+
+    transform: none;
+
+    margin: 3vh auto;
+
+    grid-template-columns: 1fr;
+
+    max-height: none;
+  }
+
+  .brand-panel {
+    min-height: 50vh;
+
+    border-right: none;
+
+    border-bottom: 1px solid var(--border);
+  }
+
+  .login-panel {
+    min-height: 50vh;
+  }
+
+  .brand-content {
+    margin-top: 60px;
+    margin-bottom: 50px;
+  }
+}
+
+
+/* =====================================================
+   CELULAR
+===================================================== */
+
+@media (max-width: 550px) {
+
+  .login-container {
+    width: 94vw;
+
+    margin: 3vh auto;
+
+    border-radius: 18px;
+  }
+
+  .brand-panel,
+  .login-panel {
+    padding: 30px 24px;
+  }
+
+  .brand-panel {
+    min-height: 440px;
+  }
+
+  .login-panel {
+    min-height: 560px;
+  }
+
+  .brand-content h2 {
+    font-size: clamp(34px, 11vw, 44px);
+  }
+
+  .system-info {
+    gap: 20px;
+  }
+
+  .system-info strong {
+    font-size: 9px;
+  }
+
+  .sentinela-logo {
+    width: min(220px, 65vw);
+  }
+}
+
+
+/* =====================================================
+   CELULARES MUITO PEQUENOS
+===================================================== */
+
+@media (max-width: 380px) {
+
+  .brand-panel,
+  .login-panel {
+    padding: 25px 18px;
+  }
+
+  .brand-panel {
+    min-height: 400px;
+  }
+
+  .login-panel {
+    min-height: 520px;
+  }
+
+  .system-info {
+    gap: 15px;
+  }
+
+  .system-info span {
+    font-size: 7px;
+  }
+
+  .system-info strong {
+    font-size: 8px;
+  }
+}
