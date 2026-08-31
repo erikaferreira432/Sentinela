@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR"> 
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +10,12 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/
-  css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  >
+
   <link rel="stylesheet" href="css/css.index/style.css">
 </head>
 
@@ -29,15 +33,11 @@
     <section class="brand-panel">
 
       <div class="brand">
-
-        <div class="brand">
-  <img
-    src="sentinelalogo.png"
-    alt="Sentinela - Sistema Hospitalar"
-    class="sentinela-logo"
-  >
-</div>
-
+        <img
+          src="sentinelalogo.png"
+          alt="Sentinela - Sistema Hospitalar"
+          class="sentinela-logo"
+        >
       </div>
 
       <div class="brand-content">
@@ -60,6 +60,7 @@
       </div>
 
       <div class="system-info">
+
         <div>
           <span>STATUS</span>
           <strong>ONLINE</strong>
@@ -74,6 +75,7 @@
           <span>REDE</span>
           <strong>SEGURA</strong>
         </div>
+
       </div>
 
     </section>
@@ -99,11 +101,15 @@
 
         <form onsubmit="event.preventDefault(); login();">
 
+          <!-- USUÁRIO -->
           <div class="input-group">
 
-            <label for="usuario">IDENTIFICAÇÃO</label>
+            <label for="usuario">
+              IDENTIFICAÇÃO
+            </label>
 
             <div class="input-wrapper">
+
               <span class="input-icon">◉</span>
 
               <input
@@ -111,17 +117,23 @@
                 type="text"
                 placeholder="Digite seu usuário"
                 autocomplete="username"
+                required
               >
+
             </div>
 
           </div>
 
 
+          <!-- SENHA -->
           <div class="input-group">
 
-            <label for="senha">CÓDIGO DE ACESSO</label>
+            <label for="senha">
+              CÓDIGO DE ACESSO
+            </label>
 
             <div class="input-wrapper">
+
               <span class="input-icon">●</span>
 
               <input
@@ -129,13 +141,19 @@
                 type="password"
                 placeholder="Digite sua senha"
                 autocomplete="current-password"
+                required
               >
+
             </div>
 
           </div>
 
 
-          <button type="submit" class="login-button">
+          <!-- BOTÃO -->
+          <button
+            type="submit"
+            class="login-button"
+          >
 
             <span>ACESSAR SISTEMA</span>
 
@@ -146,18 +164,23 @@
         </form>
 
 
+        <!-- SEGURANÇA -->
         <div class="security">
 
           <span class="shield">🛡</span>
 
           <div>
             <strong>CONEXÃO SEGURA</strong>
-            <small>Seus dados são protegidos pelo sistema Sentinela.</small>
+
+            <small>
+              Seus dados são protegidos pelo sistema Sentinela.
+            </small>
           </div>
 
         </div>
 
       </div>
+
 
       <footer>
         SENTINELA © 2026 · SISTEMA HOSPITALAR
@@ -168,50 +191,83 @@
   </main>
 
 
-<script>
+  <!-- JAVASCRIPT -->
+  <script>
 
-function login() {
+    async function login() {
 
-  const usuario = document.getElementById("usuario").value;
-  const senha = document.getElementById("senha").value;
+      const usuarioInput = document.getElementById("usuario");
+      const senhaInput = document.getElementById("senha");
 
-  fetch("login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-  body: JSON.stringify({
-  usuario: usuario,
-  senha: senha
-})
+      const usuario = usuarioInput.value.trim();
+      const senha = senhaInput.value;
 
-    })
-  })
+      if (!usuario || !senha) {
+        alert("Digite a identificação e o código de acesso.");
+        return;
+      }
 
-  .then(r => r.json()) 
+      try {
 
-  .then(data => {
+        const resposta = await fetch("/login", {
 
-    if (data.tipo === "triagem")
-      location.href = "triagem.html";
+          method: "POST",
 
-    if (data.tipo === "medico")
-      location.href = "medico.html";
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-    if (data.tipo === "atendimento")
-      location.href = "atendimento.html";
+          body: JSON.stringify({
+            usuario: usuario,
+            senha: senha
+          })
 
-  })
+        });
 
-  .catch(error => {
 
-    console.error("Erro ao conectar com o servidor:", error);
+        const data = await resposta.json();
 
-  });
 
-}
+        if (!resposta.ok) {
 
-</script>
+          alert(data.erro || "Identificação ou código de acesso inválido.");
+
+          return;
+        }
+
+
+        if (data.tipo === "triagem") {
+
+          window.location.href = "triagem.html";
+
+        } else if (data.tipo === "medico") {
+
+          window.location.href = "medico.html";
+
+        } else if (data.tipo === "atendimento") {
+
+          window.location.href = "atendimento.html";
+
+        } else {
+
+          alert("Usuário autenticado, mas o tipo de acesso não foi identificado.");
+
+        }
+
+      } catch (error) {
+
+        console.error("Erro no login:", error);
+
+        alert(
+          "Não foi possível conectar ao servidor. " +
+          "Verifique se a API está funcionando."
+        );
+
+      }
+
+    }
+
+  </script>
 
 </body>
 </html>
