@@ -119,73 +119,98 @@ app.post("/login", (req, res) => {
   try {
 
     console.log("=================================");
-    console.log("TENTATIVA DE LOGIN");
-    console.log("Body recebido:", req.body);
+    console.log("LOGIN RECEBIDO");
+    console.log("BODY:", req.body);
 
 
     const db = readDB();
 
 
-    // Pega os dados enviados pelo navegador
-    const usuario = String(
-      req.body?.usuario || ""
-    ).trim();
-
-    const senha = String(
-      req.body?.senha || ""
-    ).trim();
-
-
-    console.log("Usuário:", usuario);
-    console.log("Senha:", senha);
     console.log(
-      "Usuários cadastrados:",
-      db.usuarios?.length || 0
+      "BANCO:",
+      db.usuarios
     );
 
 
-    // Verifica preenchimento
-    if (!usuario || !senha) {
+    const usuarioRecebido =
+      String(req.body?.usuario || "")
+        .trim()
+        .toLowerCase();
+
+
+    const senhaRecebida =
+      String(req.body?.senha || "")
+        .trim();
+
+
+    console.log(
+      "USUARIO RECEBIDO:",
+      usuarioRecebido
+    );
+
+    console.log(
+      "SENHA RECEBIDA:",
+      senhaRecebida
+    );
+
+
+    if (!usuarioRecebido || !senhaRecebida) {
 
       return res.status(400).json({
 
-        sucesso: false,
-
         erro:
-          "Informe a identificação e o código de acesso."
+          "Digite a identificação e o código de acesso."
 
       });
 
     }
 
 
-    // Procura o usuário
-    const user = (db.usuarios || []).find(
-      (u) => {
-
-        const usuarioBanco =
-          String(u.usuario || "").trim();
-
-        const senhaBanco =
-          String(u.senha || "").trim();
+    const usuarios =
+      Array.isArray(db.usuarios)
+        ? db.usuarios
+        : [];
 
 
-        return (
-          usuarioBanco === usuario &&
-          senhaBanco === senha
-        );
+    const user = usuarios.find((u) => {
 
-      }
-    );
+      const usuarioBanco =
+        String(u.usuario || "")
+          .trim()
+          .toLowerCase();
 
 
-    // Login inválido
+      const senhaBanco =
+        String(u.senha || "")
+          .trim();
+
+
+      console.log(
+        "COMPARANDO:",
+        usuarioBanco,
+        "com",
+        usuarioRecebido,
+        "| senha:",
+        senhaBanco,
+        "com",
+        senhaRecebida
+      );
+
+
+      return (
+        usuarioBanco === usuarioRecebido &&
+        senhaBanco === senhaRecebida
+      );
+
+    });
+
+
     if (!user) {
 
       console.log(
-        "LOGIN INVÁLIDO:",
-        usuario
+        "❌ USUÁRIO NÃO ENCONTRADO"
       );
+
 
       return res.status(401).json({
 
@@ -199,11 +224,9 @@ app.post("/login", (req, res) => {
     }
 
 
-    // Login correto
     console.log(
-      "LOGIN REALIZADO:",
+      "✅ LOGIN OK:",
       user.usuario,
-      "| tipo:",
       user.tipo
     );
 
@@ -222,7 +245,7 @@ app.post("/login", (req, res) => {
   } catch (error) {
 
     console.error(
-      "ERRO NO LOGIN:",
+      "❌ ERRO NO LOGIN:",
       error
     );
 
