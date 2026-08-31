@@ -180,9 +180,11 @@ function login() {
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({
-      usuario: usuario.value,
-      senha: senha.value
+  body: JSON.stringify({
+  usuario: usuario,
+  senha: senha
+})
+
     })
   })
 
