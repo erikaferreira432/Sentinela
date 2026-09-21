@@ -1,0 +1,179 @@
+<!DOCTYPE html> <html lang="pt-BR"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>Alta Médica</title> <link rel="stylesheet" href="css/style.css"> <style> body { background: #f4f6f9; font-family: Arial, sans-serif; margin: 0; padding: 20px; } .container { max-width: 900px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); } .cabecalho { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #ddd; padding-bottom: 15px; margin-bottom: 25px; } .cabecalho h1 { margin: 0; color: #1f4e79; } .secao { margin-top: 25px; } .secao h2 { color: #1f4e79; font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 8px; } .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; } .campo { display: flex; flex-direction: column; } .campo label { font-weight: bold; margin-bottom: 6px; color: #444; } input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; box-sizing: border-box; } textarea { min-height: 90px; resize: vertical; } .campo-completo { grid-column: 1 / -1; } .botoes { display: flex; gap: 10px; justify-content: flex-end; margin-top: 30px; border-top: 1px solid #ddd; padding-top: 20px; } button { padding: 11px 20px; border: none; border-radius: 7px; cursor: pointer; font-weight: bold; } .btn-salvar { background: #28a745; color: white; } .btn-pdf { background: #dc3545; color: white; } .btn-voltar { background: #6c757d; color: white; } button:hover { opacity: 0.9; } .aviso { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; padding: 12px; border-radius: 6px; margin-bottom: 20px; } @media (max-width: 700px) { .grid { grid-template-columns: 1fr; } .campo-completo { grid-column: auto; } .botoes { flex-direction: column; } button { width: 100%; } } @media print { body { background: white; padding: 0; } .container { box-shadow: none; max-width: 100%; } .botoes, .aviso { display: none; } input, select, textarea { border: 1px solid #999; } } </style> </head> <body> <div class="container"> <div class="cabecalho"> <h1>🏥 Alta Médica</h1> <span id="data-alta"></span> </div> <div class="aviso"> Preencha os dados da alta médica e confira as informações antes de finalizar. </div> <!-- IDENTIFICAÇÃO --> <div class="secao"> <h2>Identificação do Paciente</h2>
+<div class="grid">
+
+  <div class="campo">
+    <label for="paciente">Paciente</label>
+    <input type="text" id="paciente" placeholder="Nome completo">
+  </div>
+
+  <div class="campo">
+    <label for="data-nascimento">Data de nascimento</label>
+    <input type="date" id="data-nascimento">
+  </div>
+
+  <div class="campo">
+    <label for="documento">CPF / Documento</label>
+    <input type="text" id="documento" placeholder="CPF ou documento">
+  </div>
+
+  <div class="campo">
+    <label for="prontuario">Nº do prontuário</label>
+    <input type="text" id="prontuario" placeholder="Número do prontuário">
+  </div>
+
+</div>
+
+</div> <!-- DADOS DA ALTA --> <div class="secao"> <h2>Dados da Alta</h2>
+<div class="grid">
+
+  <div class="campo">
+    <label for="tipo-alta">Tipo de alta</label>
+
+    <select id="tipo-alta">
+      <option value="">Selecione</option>
+      <option value="Alta médica">Alta médica</option>
+      <option value="Alta a pedido">Alta a pedido</option>
+      <option value="Alta administrativa">Alta administrativa</option>
+      <option value="Transferência">Transferência</option>
+      <option value="Evasão">Evasão</option>
+    </select>
+  </div>
+
+  <div class="campo">
+    <label for="data-hora">Data e hora da alta</label>
+    <input type="datetime-local" id="data-hora">
+  </div>
+
+  <div class="campo campo-completo">
+    <label for="diagnostico">Diagnóstico</label>
+    <textarea
+      id="diagnostico"
+      placeholder="Informe o diagnóstico principal e, se necessário, diagnósticos secundários."
+    ></textarea>
+  </div>
+
+</div>
+
+</div> <!-- EVOLUÇÃO --> <div class="secao"> <h2>Evolução Clínica</h2>
+<div class="campo">
+  <label for="evolucao">Resumo da evolução</label>
+
+  <textarea
+    id="evolucao"
+    placeholder="Descreva de forma objetiva a evolução clínica do paciente durante o atendimento."
+  ></textarea>
+</div>
+
+</div> <!-- CONDIÇÃO --> <div class="secao"> <h2>Condição no Momento da Alta</h2>
+<div class="grid">
+
+  <div class="campo">
+    <label for="condicao">Condição clínica</label>
+
+    <select id="condicao">
+      <option value="">Selecione</option>
+      <option value="Estável">Estável</option>
+      <option value="Melhorado">Melhorado</option>
+      <option value="Sem alterações significativas">Sem alterações significativas</option>
+      <option value="Necessita acompanhamento">Necessita acompanhamento</option>
+    </select>
+  </div>
+
+  <div class="campo">
+    <label for="destino">Destino após a alta</label>
+
+    <select id="destino">
+      <option value="">Selecione</option>
+      <option value="Domicílio">Domicílio</option>
+      <option value="Acompanhamento ambulatorial">Acompanhamento ambulatorial</option>
+      <option value="Outro serviço de saúde">Outro serviço de saúde</option>
+      <option value="Transferência hospitalar">Transferência hospitalar</option>
+    </select>
+  </div>
+
+</div>
+
+</div> <!-- MEDICAÇÕES --> <div class="secao"> <h2>Medicações e Prescrição</h2>
+<div class="campo">
+  <label for="medicacoes">Medicações prescritas</label>
+
+  <textarea
+    id="medicacoes"
+    placeholder="Informe medicamentos, doses, horários e duração conforme prescrição."
+  ></textarea>
+</div>
+
+</div> <!-- ORIENTAÇÕES --> <div class="secao"> <h2>Orientações ao Paciente</h2>
+<div class="campo">
+  <label for="orientacoes">Orientações e cuidados</label>
+
+  <textarea
+    id="orientacoes"
+    placeholder="Informe cuidados, recomendações, retorno e demais orientações."
+  ></textarea>
+</div>
+
+<br>
+
+<div class="campo">
+  <label for="sinais-alerta">Sinais de alerta / quando procurar atendimento</label>
+
+  <textarea
+    id="sinais-alerta"
+    placeholder="Informe os sinais ou sintomas que exigem nova avaliação."
+  ></textarea>
+</div>
+
+</div> <!-- RETORNO --> <div class="secao"> <h2>Acompanhamento</h2>
+<div class="grid">
+
+  <div class="campo">
+    <label for="retorno">Retorno recomendado</label>
+    <input type="text" id="retorno" placeholder="Ex.: Retorno em 7 dias">
+  </div>
+
+  <div class="campo">
+    <label for="especialidade">Especialidade / Serviço</label>
+    <input type="text" id="especialidade" placeholder="Ex.: Clínica médica">
+  </div>
+
+</div>
+
+</div> <!-- PROFISSIONAL --> <div class="secao"> <h2>Profissional Responsável</h2>
+<div class="grid">
+
+  <div class="campo">
+    <label for="medico">Nome do profissional</label>
+    <input type="text" id="medico" placeholder="Nome completo">
+  </div>
+
+  <div class="campo">
+    <label for="crm">CRM / Registro profissional</label>
+    <input type="text" id="crm" placeholder="Registro profissional">
+  </div>
+
+</div>
+
+</div> <!-- BOTÕES --> <div class="botoes">
+<button
+  type="button"
+  class="btn-voltar"
+  onclick="window.history.back()">
+  ← Voltar
+</button>
+
+<button
+  type="button"
+  class="btn-pdf"
+  onclick="window.print()">
+  📄 Gerar PDF
+</button>
+
+<button
+  type="button"
+  class="btn-salvar"
+  onclick="salvarAlta()">
+  ✅ Finalizar Alta
+</button>
+
+</div> </div> <script> function preencherData() { const agora = new Date(); const ano = agora.getFullYear(); const mes = String(agora.getMonth() + 1).padStart(2, "0"); const dia = String(agora.getDate()).padStart(2, "0"); const hora = String(agora.getHours()).padStart(2, "0"); const minuto = String(agora.getMinutes()).padStart(2, "0"); document.getElementById("data-hora").value = `${ano}-${mes}-${dia}T${hora}:${minuto}`; document.getElementById("data-alta").textContent = `${dia}/${mes}/${ano}`; } function salvarAlta() { const paciente = document.getElementById("paciente").value.trim(); const tipoAlta = document.getElementById("tipo-alta").value; const diagnostico = document.getElementById("diagnostico").value.trim(); if (!paciente) { alert("Informe o nome do paciente."); return; } if (!tipoAlta) { alert("Selecione o tipo de alta."); return; } if (!diagnostico) { alert("Informe o diagnóstico."); return; } const dados = { paciente: paciente, dataNascimento: document.getElementById("data-nascimento").value, documento: document.getElementById("documento").value, prontuario: document.getElementById("prontuario").value, tipoAlta: tipoAlta, dataHora: document.getElementById("data-hora").value, diagnostico: diagnostico, evolucao: document.getElementById("evolucao").value, condicao: document.getElementById("condicao").value, destino: document.getElementById("destino").value, medicacoes: document.getElementById("medicacoes").value, orientacoes: document.getElementById("orientacoes").value, sinaisAlerta: document.getElementById("sinais-alerta").value, retorno: document.getElementById("retorno").value, especialidade: document.getElementById("especialidade").value, medico: document.getElementById("medico").value, crm: document.getElementById("crm").value }; /* * Envia os dados para o backend. * * A rota /alta deverá ser criada no servidor. */ fetch("/alta", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dados) }) .then(response => { if (!response.ok) { throw new Error("Erro ao registrar alta."); } return response.json(); }) .then(() => { alert("✅ Alta registrada com sucesso!"); window.print(); }) .catch(error => { console.error(error); alert( "Não foi possível registrar a alta. " + "Verifique se o servidor está funcionando." ); }); } preencherData(); </script> </body> </html>
