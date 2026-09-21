@@ -5,96 +5,193 @@ const cors = require("cors");
 
 const app = express();
 
-
 // =====================================================
 // CONFIGURAÇÕES
 // =====================================================
 
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
+app.use(express.json());
+
+app.use(
+express.urlencoded({
+extended: true
+})
+);
+
+// =====================================================
+// CAMINHO DO FRONTEND
+// =====================================================
+
+const FRONTEND_DIR =
+path.join(__dirname, "../frontend");
 
 // =====================================================
 // FRONTEND
 // =====================================================
 
 app.use(
-  express.static(
-    path.join(__dirname, "../frontend")
-  )
+express.static(FRONTEND_DIR)
 );
-
 
 // =====================================================
 // BANCO DE DADOS
 // =====================================================
 
-const DB_FILE = path.join(__dirname, "db.json");
+const DB_FILE =
+path.join(__dirname, "db.json");
+
+function bancoVazio() {
+
+return {
+
+```
+usuarios: [],
+
+pacientes: [],
+
+triagens: [],
+
+consultas: []
+```
+
+};
+
+}
 
 function readDB() {
 
-  try {
+try {
 
-    if (!fs.existsSync(DB_FILE)) {
+```
+if (!fs.existsSync(DB_FILE)) {
 
-      console.error("ERRO: db.json não encontrado!");
+  console.error(
+    "ERRO: db.json não encontrado em:",
+    DB_FILE
+  );
 
-      return {
-        usuarios: [],
-        pacientes: [],
-        triagens: [],
-        consultas: []
-      };
-    }
+  return bancoVazio();
 
-    const arquivo = fs.readFileSync(
-      DB_FILE,
-      "utf8"
-    );
-
-    return JSON.parse(arquivo);
-
-  } catch (error) {
-
-    console.error(
-      "Erro ao ler db.json:",
-      error
-    );
-
-    return {
-      usuarios: [],
-      pacientes: [],
-      triagens: [],
-      consultas: []
-    };
-  }
 }
 
+
+const arquivo =
+  fs.readFileSync(
+    DB_FILE,
+    "utf8"
+  );
+
+
+if (!arquivo.trim()) {
+
+  console.error(
+    "ERRO: db.json está vazio."
+  );
+
+  return bancoVazio();
+
+}
+
+
+const banco =
+  JSON.parse(arquivo);
+
+
+return {
+
+  usuarios:
+    Array.isArray(banco.usuarios)
+      ? banco.usuarios
+      : [],
+
+  pacientes:
+    Array.isArray(banco.pacientes)
+      ? banco.pacientes
+      : [],
+
+  triagens:
+    Array.isArray(banco.triagens)
+      ? banco.triagens
+      : [],
+
+  consultas:
+    Array.isArray(banco.consultas)
+      ? banco.consultas
+      : []
+
+};
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao ler db.json:",
+  error.message
+);
+
+
+return bancoVazio();
+```
+
+}
+
+}
 
 function writeDB(data) {
 
-  try {
+try {
 
-    fs.writeFileSync(
-      DB_FILE,
-      JSON.stringify(data, null, 2),
-      "utf8"
-    );
+```
+fs.writeFileSync(
 
-    return true;
+  DB_FILE,
 
-  } catch (error) {
+  JSON.stringify(
+    data,
+    null,
+    2
+  ),
 
-    console.error(
-      "Erro ao salvar banco:",
-      error
-    );
+  "utf8"
 
-    return false;
-  }
+);
+
+
+return true;
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao salvar banco:",
+  error.message
+);
+
+
+return false;
+```
+
 }
 
+}
+
+// =====================================================
+// PÁGINA INICIAL
+// =====================================================
+
+app.get("/", (req, res) => {
+
+res.sendFile(
+path.join(
+FRONTEND_DIR,
+"index.html"
+)
+);
+
+});
 
 // =====================================================
 // TESTE DA API
@@ -102,13 +199,22 @@ function writeDB(data) {
 
 app.get("/api", (req, res) => {
 
-  res.json({
-    sistema: "Sentinela",
-    status: "online"
-  });
+res.status(200).json({
+
+```
+sistema: "Sentinela",
+
+status: "online",
+
+servidor: "Render",
+
+timestamp:
+  new Date().toISOString()
+```
 
 });
 
+});
 
 // =====================================================
 // LOGIN
@@ -116,153 +222,263 @@ app.get("/api", (req, res) => {
 
 app.post("/login", (req, res) => {
 
-  try {
+try {
 
-    console.log("=================================");
-    console.log("LOGIN RECEBIDO");
-    console.log("BODY:", req.body);
+```
+console.log(
+  "================================="
+);
 
-
-    const db = readDB();
-
-
-    console.log(
-      "BANCO:",
-      db.usuarios
-    );
+console.log(
+  "LOGIN RECEBIDO"
+);
 
 
-    const usuarioRecebido =
-      String(req.body?.usuario || "")
+const db =
+  readDB();
+
+
+const usuarioRecebido =
+
+  String(
+    req.body?.usuario || ""
+  )
+    .trim()
+    .toLowerCase();
+
+
+const senhaRecebida =
+
+  String(
+    req.body?.senha || ""
+  )
+    .trim();
+
+
+console.log(
+  "USUARIO:",
+  usuarioRecebido
+);
+
+
+/*
+ * Não registrar a senha no console.
+ */
+
+
+if (
+  !usuarioRecebido ||
+  !senhaRecebida
+) {
+
+  return res.status(400).json({
+
+    sucesso: false,
+
+    erro:
+      "Digite a identificação e o código de acesso."
+
+  });
+
+}
+
+
+const usuarios =
+
+  Array.isArray(db.usuarios)
+
+    ? db.usuarios
+
+    : [];
+
+
+const user =
+
+  usuarios.find((u) => {
+
+    const usuarioBanco =
+
+      String(
+        u?.usuario || ""
+      )
         .trim()
         .toLowerCase();
 
 
-    const senhaRecebida =
-      String(req.body?.senha || "")
+    const senhaBanco =
+
+      String(
+        u?.senha || ""
+      )
         .trim();
 
 
-    console.log(
-      "USUARIO RECEBIDO:",
+    return (
+
+      usuarioBanco ===
       usuarioRecebido
-    );
 
-    console.log(
-      "SENHA RECEBIDA:",
+      &&
+
+      senhaBanco ===
       senhaRecebida
+
     );
 
-
-    if (!usuarioRecebido || !senhaRecebida) {
-
-      return res.status(400).json({
-
-        erro:
-          "Digite a identificação e o código de acesso."
-
-      });
-
-    }
+  });
 
 
-    const usuarios =
-      Array.isArray(db.usuarios)
-        ? db.usuarios
-        : [];
+if (!user) {
+
+  console.log(
+    "LOGIN NEGADO:",
+    usuarioRecebido
+  );
 
 
-    const user = usuarios.find((u) => {
+  return res.status(401).json({
 
-      const usuarioBanco =
-        String(u.usuario || "")
-          .trim()
-          .toLowerCase();
+    sucesso: false,
 
+    erro:
+      "Identificação ou código de acesso inválido."
 
-      const senhaBanco =
-        String(u.senha || "")
-          .trim();
+  });
 
-
-      console.log(
-        "COMPARANDO:",
-        usuarioBanco,
-        "com",
-        usuarioRecebido,
-        "| senha:",
-        senhaBanco,
-        "com",
-        senhaRecebida
-      );
+}
 
 
-      return (
-        usuarioBanco === usuarioRecebido &&
-        senhaBanco === senhaRecebida
-      );
+/*
+ * Normaliza o tipo do usuário.
+ */
 
-    });
+const tipo =
 
-
-    if (!user) {
-
-      console.log(
-        "❌ USUÁRIO NÃO ENCONTRADO"
-      );
+  String(
+    user.tipo || ""
+  )
+    .trim()
+    .toLowerCase();
 
 
-      return res.status(401).json({
+/*
+ * Verifica se o usuário possui
+ * um tipo válido.
+ */
 
-        sucesso: false,
+const tiposPermitidos = [
 
-        erro:
-          "Identificação ou código de acesso inválido."
+  "triagem",
 
-      });
+  "medico",
 
-    }
+  "atendimento"
 
-
-    console.log(
-      "✅ LOGIN OK:",
-      user.usuario,
-      user.tipo
-    );
+];
 
 
-    return res.status(200).json({
+if (
+  !tiposPermitidos.includes(tipo)
+) {
 
-      sucesso: true,
-
-      usuario: user.usuario,
-
-      tipo: user.tipo
-
-    });
-
-
-  } catch (error) {
-
-    console.error(
-      "❌ ERRO NO LOGIN:",
-      error
-    );
+  console.error(
+    "Tipo de usuário inválido:",
+    tipo
+  );
 
 
-    return res.status(500).json({
+  return res.status(403).json({
 
-      sucesso: false,
+    sucesso: false,
 
-      erro:
-        "Erro interno no servidor."
+    erro:
+      "O usuário não possui um tipo de acesso válido."
 
-    });
+  });
 
-  }
+}
+
+
+console.log(
+  "LOGIN OK:",
+  user.usuario,
+  "| tipo:",
+  tipo
+);
+
+
+return res.status(200).json({
+
+  sucesso: true,
+
+  usuario: user.usuario,
+
+  tipo: tipo
+
+});
+```
+
+} catch (error) {
+
+```
+console.error(
+  "ERRO NO LOGIN:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  sucesso: false,
+
+  erro:
+    "Erro interno no servidor."
+
+});
+```
+
+}
 
 });
 
+// =====================================================
+// PACIENTES
+// =====================================================
+
+app.get("/pacientes", (req, res) => {
+
+try {
+
+```
+const db =
+  readDB();
+
+
+return res.status(200).json(
+  db.pacientes || []
+);
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao listar pacientes:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  erro:
+    "Não foi possível carregar os pacientes."
+
+});
+```
+
+}
+
+});
 
 // =====================================================
 // ATENDIMENTO
@@ -270,64 +486,96 @@ app.post("/login", (req, res) => {
 
 app.post("/atendimento", (req, res) => {
 
-  try {
+try {
 
-    const db = readDB();
-
-    const paciente = {
-
-      id: Date.now(),
-
-      nome: req.body.nome || "",
-
-      cpf: req.body.cpf || "",
-
-      tipo: req.body.tipo || "Particular",
-
-      status: "triagem",
-
-      createdAt:
-        new Date().toISOString()
-
-    };
+```
+const db =
+  readDB();
 
 
-    db.pacientes.push(paciente);
+const paciente = {
+
+  id: Date.now(),
+
+  nome:
+    String(
+      req.body?.nome || ""
+    ).trim(),
+
+  cpf:
+    String(
+      req.body?.cpf || ""
+    ).trim(),
+
+  tipo:
+    String(
+      req.body?.tipo ||
+      "Particular"
+    ).trim(),
+
+  status:
+    "triagem",
+
+  createdAt:
+    new Date().toISOString()
+
+};
 
 
-    if (!writeDB(db)) {
+if (!paciente.nome) {
 
-      return res.status(500).json({
+  return res.status(400).json({
 
-        erro:
-          "Não foi possível salvar o paciente."
+    erro:
+      "O nome do paciente é obrigatório."
 
-      });
+  });
 
-    }
-
-
-    res.status(201).json(paciente);
+}
 
 
-  } catch (error) {
+db.pacientes.push(
+  paciente
+);
 
-    console.error(
-      "Erro no atendimento:",
-      error
-    );
 
-    res.status(500).json({
+if (!writeDB(db)) {
 
-      erro:
-        "Erro interno no servidor."
+  return res.status(500).json({
 
-    });
+    erro:
+      "Não foi possível salvar o paciente."
 
-  }
+  });
+
+}
+
+
+return res.status(201).json(
+  paciente
+);
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro no atendimento:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  erro:
+    "Erro interno no servidor."
 
 });
+```
 
+}
+
+});
 
 // =====================================================
 // TRIAGEM
@@ -335,95 +583,145 @@ app.post("/atendimento", (req, res) => {
 
 app.post("/triagem", (req, res) => {
 
-  try {
+try {
 
-    const db = readDB();
-
-    let risco = req.body.risco;
-
-    const temperatura =
-      Number(req.body.temperatura);
+```
+const db =
+  readDB();
 
 
-    if (temperatura >= 39) {
-
-      risco = "vermelho";
-
-    } else if (temperatura >= 38) {
-
-      risco = "amarelo";
-
-    } else if (!risco) {
-
-      risco = "verde";
-
-    }
+let risco =
+  req.body?.risco;
 
 
-    const triagem = {
-
-      id: Date.now(),
-
-      nome: req.body.nome || "",
-
-      sintoma: req.body.sintoma || "",
-
-      temperatura:
-        req.body.temperatura || "",
-
-      alergia:
-        req.body.alergia || "",
-
-      observacao:
-        req.body.observacao || "",
-
-      risco,
-
-      status:
-        "aguardando_medico",
-
-      createdAt:
-        new Date().toISOString()
-
-    };
+const temperatura =
+  Number(
+    req.body?.temperatura
+  );
 
 
-    db.triagens.push(triagem);
+if (
+  !Number.isNaN(temperatura)
+  &&
+  temperatura >= 39
+) {
+
+  risco =
+    "vermelho";
+
+}
+
+else if (
+  !Number.isNaN(temperatura)
+  &&
+  temperatura >= 38
+) {
+
+  risco =
+    "amarelo";
+
+}
+
+else if (!risco) {
+
+  risco =
+    "verde";
+
+}
 
 
-    if (!writeDB(db)) {
+const triagem = {
 
-      return res.status(500).json({
+  id: Date.now(),
 
-        erro:
-          "Não foi possível salvar a triagem."
+  nome:
+    String(
+      req.body?.nome || ""
+    ).trim(),
 
-      });
+  sintoma:
+    String(
+      req.body?.sintoma || ""
+    ).trim(),
 
-    }
+  temperatura:
+    req.body?.temperatura || "",
+
+  alergia:
+    String(
+      req.body?.alergia || ""
+    ).trim(),
+
+  observacao:
+    String(
+      req.body?.observacao || ""
+    ).trim(),
+
+  risco,
+
+  status:
+    "aguardando_medico",
+
+  createdAt:
+    new Date().toISOString()
+
+};
 
 
-    res.status(201).json(triagem);
+if (!triagem.nome) {
+
+  return res.status(400).json({
+
+    erro:
+      "O nome do paciente é obrigatório."
+
+  });
+
+}
 
 
-  } catch (error) {
+db.triagens.push(
+  triagem
+);
 
-    console.error(
-      "Erro na triagem:",
-      error
-    );
 
-    res.status(500).json({
+if (!writeDB(db)) {
 
-      erro:
-        "Erro interno no servidor."
+  return res.status(500).json({
 
-    });
+    erro:
+      "Não foi possível salvar a triagem."
 
-  }
+  });
+
+}
+
+
+return res.status(201).json(
+  triagem
+);
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro na triagem:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  erro:
+    "Erro interno no servidor."
 
 });
+```
 
+}
+
+});
 
 // =====================================================
 // LISTAR TRIAGENS
@@ -431,36 +729,75 @@ app.post("/triagem", (req, res) => {
 
 app.get("/triagens", (req, res) => {
 
-  const db = readDB();
+try {
 
-  res.json(db.triagens || []);
+```
+const db =
+  readDB();
+
+
+return res.status(200).json(
+  db.triagens || []
+);
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao listar triagens:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  erro:
+    "Não foi possível carregar as triagens."
 
 });
+```
 
+}
+
+});
 
 // =====================================================
 // LISTA DE MEDICAÇÕES
 // =====================================================
 
-app.get("/lista-medicacoes", (req, res) => {
+app.get(
+"/lista-medicacoes",
+(req, res) => {
 
-  res.json([
+```
+res.status(200).json([
 
-    "Dipirona",
-    "Paracetamol",
-    "Ibuprofeno",
-    "Amoxicilina",
-    "Azitromicina",
-    "Loratadina",
-    "Omeprazol",
-    "Buscopan",
-    "Dramin",
-    "Soro fisiológico"
+  "Dipirona",
 
-  ]);
+  "Paracetamol",
 
-});
+  "Ibuprofeno",
 
+  "Amoxicilina",
+
+  "Azitromicina",
+
+  "Loratadina",
+
+  "Omeprazol",
+
+  "Buscopan",
+
+  "Dramin",
+
+  "Soro fisiológico"
+
+]);
+```
+
+}
+);
 
 // =====================================================
 // CONSULTA
@@ -468,68 +805,97 @@ app.get("/lista-medicacoes", (req, res) => {
 
 app.post("/consulta", (req, res) => {
 
-  try {
+try {
 
-    const db = readDB();
-
-    const consulta = {
-
-      id: Date.now(),
-
-      paciente:
-        req.body.paciente || "",
-
-      diagnostico:
-        req.body.diagnostico || "",
-
-      medicacao:
-        req.body.medicacao || "",
-
-      obs:
-        req.body.obs || "",
-
-      createdAt:
-        new Date().toISOString()
-
-    };
+```
+const db =
+  readDB();
 
 
-    db.consultas.push(consulta);
+const consulta = {
+
+  id: Date.now(),
+
+  paciente:
+    String(
+      req.body?.paciente || ""
+    ).trim(),
+
+  diagnostico:
+    String(
+      req.body?.diagnostico || ""
+    ).trim(),
+
+  medicacao:
+    String(
+      req.body?.medicacao || ""
+    ).trim(),
+
+  obs:
+    String(
+      req.body?.obs || ""
+    ).trim(),
+
+  createdAt:
+    new Date().toISOString()
+
+};
 
 
-    if (!writeDB(db)) {
+if (!consulta.paciente) {
 
-      return res.status(500).json({
+  return res.status(400).json({
 
-        erro:
-          "Não foi possível salvar a consulta."
+    erro:
+      "O paciente é obrigatório."
 
-      });
+  });
 
-    }
-
-
-    res.status(201).json(consulta);
+}
 
 
-  } catch (error) {
+db.consultas.push(
+  consulta
+);
 
-    console.error(
-      "Erro na consulta:",
-      error
-    );
 
-    res.status(500).json({
+if (!writeDB(db)) {
 
-      erro:
-        "Erro interno no servidor."
+  return res.status(500).json({
 
-    });
+    erro:
+      "Não foi possível salvar a consulta."
 
-  }
+  });
+
+}
+
+
+return res.status(201).json(
+  consulta
+);
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro na consulta:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  erro:
+    "Erro interno no servidor."
 
 });
+```
 
+}
+
+});
 
 // =====================================================
 // MEDICAÇÕES / CONSULTAS
@@ -537,46 +903,137 @@ app.post("/consulta", (req, res) => {
 
 app.get("/medicacoes", (req, res) => {
 
-  const db = readDB();
+try {
 
-  res.json(db.consultas || []);
+```
+const db =
+  readDB();
+
+
+return res.status(200).json(
+  db.consultas || []
+);
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao listar consultas:",
+  error.message
+);
+
+
+return res.status(500).json({
+
+  erro:
+    "Não foi possível carregar as consultas."
+
+});
+```
+
+}
 
 });
 
-
 // =====================================================
-// ROTA NÃO ENCONTRADA
+// ERRO 404
 // =====================================================
 
 app.use((req, res) => {
 
-  res.status(404).json({
+res.status(404).json({
 
-    erro: "Rota não encontrada",
+```
+erro:
+  "Rota não encontrada",
 
-    rota: req.originalUrl
-
-  });
+rota:
+  req.originalUrl
+```
 
 });
 
+});
+
+// =====================================================
+// TRATAMENTO DE ERROS
+// =====================================================
+
+app.use(
+(
+error,
+req,
+res,
+next
+) => {
+
+```
+console.error(
+  "ERRO NÃO TRATADO:",
+  error
+);
+
+
+if (res.headersSent) {
+
+  return next(error);
+
+}
+
+
+res.status(500).json({
+
+  erro:
+    "Erro interno no servidor."
+
+});
+```
+
+}
+);
 
 // =====================================================
 // INICIALIZAÇÃO
 // =====================================================
 
 const PORT =
-  process.env.PORT || 10000;
-
+process.env.PORT || 10000;
 
 app.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
 
-    console.log(
-      `Sentinela rodando na porta ${PORT}`
-    );
+PORT,
 
-  }
+"0.0.0.0",
+
+() => {
+
+```
+console.log(
+  "================================="
+);
+
+console.log(
+  "SENTINELA INICIADO"
+);
+
+console.log(
+  `Porta: ${PORT}`
+);
+
+console.log(
+  `Frontend: ${FRONTEND_DIR}`
+);
+
+console.log(
+  `Banco: ${DB_FILE}`
+);
+
+console.log(
+  "================================="
+);
+```
+
+}
+
 );
