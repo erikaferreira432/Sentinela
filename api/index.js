@@ -23,8 +23,10 @@ extended: true
 // CAMINHO DO FRONTEND
 // =====================================================
 
-const FRONTEND_DIR =
-path.join(__dirname, "../frontend");
+const FRONTEND_DIR = path.join(
+__dirname,
+"../frontend"
+);
 
 // =====================================================
 // FRONTEND
@@ -38,88 +40,82 @@ express.static(FRONTEND_DIR)
 // BANCO DE DADOS
 // =====================================================
 
-const DB_FILE =
-path.join(__dirname, "db.json");
+const DB_FILE = path.join(
+__dirname,
+"db.json"
+);
 
+// Estrutura padrão do banco
 function bancoVazio() {
-
 return {
-
-```
 usuarios: [],
-
 pacientes: [],
-
 triagens: [],
-
-consultas: []
-```
-
+consultas: [],
+tv_chamada: null,
+tv_historico: []
 };
-
 }
+
+// =====================================================
+// LER BANCO
+// =====================================================
 
 function readDB() {
-
 try {
+if (!fs.existsSync(DB_FILE)) {
+console.error(
+"ERRO: db.json não encontrado em:",
+DB_FILE
+);
 
 ```
-if (!fs.existsSync(DB_FILE)) {
-
-  console.error(
-    "ERRO: db.json não encontrado em:",
-    DB_FILE
-  );
-
   return bancoVazio();
-
 }
 
-
-const arquivo =
-  fs.readFileSync(
-    DB_FILE,
-    "utf8"
-  );
-
+const arquivo = fs.readFileSync(
+  DB_FILE,
+  "utf8"
+);
 
 if (!arquivo.trim()) {
-
   console.error(
     "ERRO: db.json está vazio."
   );
 
   return bancoVazio();
-
 }
 
-
-const banco =
-  JSON.parse(arquivo);
-
+const banco = JSON.parse(arquivo);
 
 return {
+  usuarios: Array.isArray(banco.usuarios)
+    ? banco.usuarios
+    : [],
 
-  usuarios:
-    Array.isArray(banco.usuarios)
-      ? banco.usuarios
-      : [],
+  pacientes: Array.isArray(banco.pacientes)
+    ? banco.pacientes
+    : [],
 
-  pacientes:
-    Array.isArray(banco.pacientes)
-      ? banco.pacientes
-      : [],
+  triagens: Array.isArray(banco.triagens)
+    ? banco.triagens
+    : [],
 
-  triagens:
-    Array.isArray(banco.triagens)
-      ? banco.triagens
-      : [],
+  consultas: Array.isArray(banco.consultas)
+    ? banco.consultas
+    : [],
 
-  consultas:
-    Array.isArray(banco.consultas)
-      ? banco.consultas
-      : []
+  tv_chamada:
+    banco.tv_chamada &&
+    typeof banco.tv_chamada === "object"
+      ? banco.tv_chamada
+      : null,
 
+  tv_historico: Array.isArray(
+    banco.tv_historico
+  )
+    ? banco.tv_historico
+    : []
 };
 ```
 
@@ -131,33 +127,29 @@ console.error(
   error.message
 );
 
-
 return bancoVazio();
 ```
 
 }
-
 }
 
-function writeDB(data) {
+// =====================================================
+// SALVAR BANCO
+// =====================================================
 
+function writeDB(data) {
 try {
 
 ```
 fs.writeFileSync(
-
   DB_FILE,
-
   JSON.stringify(
     data,
     null,
     2
   ),
-
   "utf8"
-
 );
-
 
 return true;
 ```
@@ -170,12 +162,10 @@ console.error(
   error.message
 );
 
-
 return false;
 ```
 
 }
-
 }
 
 // =====================================================
@@ -217,6 +207,27 @@ timestamp:
 });
 
 // =====================================================
+// HEALTH CHECK
+// =====================================================
+
+app.get("/health", (req, res) => {
+
+res.status(200).json({
+
+```
+status: "ok",
+
+sistema: "Sentinela",
+
+timestamp:
+  new Date().toISOString()
+```
+
+});
+
+});
+
+// =====================================================
 // LOGIN
 // =====================================================
 
@@ -233,38 +244,27 @@ console.log(
   "LOGIN RECEBIDO"
 );
 
-
-const db =
-  readDB();
-
+const db = readDB();
 
 const usuarioRecebido =
-
   String(
     req.body?.usuario || ""
   )
     .trim()
     .toLowerCase();
 
-
 const senhaRecebida =
-
   String(
     req.body?.senha || ""
   )
     .trim();
-
 
 console.log(
   "USUARIO:",
   usuarioRecebido
 );
 
-
-/*
- * Não registrar a senha no console.
- */
-
+// Nunca registrar a senha no console.
 
 if (
   !usuarioRecebido ||
@@ -282,51 +282,35 @@ if (
 
 }
 
-
 const usuarios =
-
   Array.isArray(db.usuarios)
-
     ? db.usuarios
-
     : [];
 
-
 const user =
-
   usuarios.find((u) => {
 
     const usuarioBanco =
-
       String(
         u?.usuario || ""
       )
         .trim()
         .toLowerCase();
 
-
     const senhaBanco =
-
       String(
         u?.senha || ""
       )
         .trim();
 
-
     return (
-
       usuarioBanco ===
-      usuarioRecebido
-
-      &&
-
+      usuarioRecebido &&
       senhaBanco ===
       senhaRecebida
-
     );
 
   });
-
 
 if (!user) {
 
@@ -334,7 +318,6 @@ if (!user) {
     "LOGIN NEGADO:",
     usuarioRecebido
   );
-
 
   return res.status(401).json({
 
@@ -347,35 +330,18 @@ if (!user) {
 
 }
 
-
-/*
- * Normaliza o tipo do usuário.
- */
-
 const tipo =
-
   String(
     user.tipo || ""
   )
     .trim()
     .toLowerCase();
 
-
-/*
- * Verifica se o usuário possui
- * um tipo válido.
- */
-
 const tiposPermitidos = [
-
   "triagem",
-
   "medico",
-
   "atendimento"
-
 ];
-
 
 if (
   !tiposPermitidos.includes(tipo)
@@ -385,7 +351,6 @@ if (
     "Tipo de usuário inválido:",
     tipo
   );
-
 
   return res.status(403).json({
 
@@ -398,7 +363,6 @@ if (
 
 }
 
-
 console.log(
   "LOGIN OK:",
   user.usuario,
@@ -406,14 +370,15 @@ console.log(
   tipo
 );
 
-
 return res.status(200).json({
 
   sucesso: true,
 
-  usuario: user.usuario,
+  usuario:
+    user.usuario,
 
-  tipo: tipo
+  tipo:
+    tipo
 
 });
 ```
@@ -425,7 +390,6 @@ console.error(
   "ERRO NO LOGIN:",
   error.message
 );
-
 
 return res.status(500).json({
 
@@ -450,9 +414,7 @@ app.get("/pacientes", (req, res) => {
 try {
 
 ```
-const db =
-  readDB();
-
+const db = readDB();
 
 return res.status(200).json(
   db.pacientes || []
@@ -466,7 +428,6 @@ console.error(
   "Erro ao listar pacientes:",
   error.message
 );
-
 
 return res.status(500).json({
 
@@ -489,13 +450,12 @@ app.post("/atendimento", (req, res) => {
 try {
 
 ```
-const db =
-  readDB();
-
+const db = readDB();
 
 const paciente = {
 
-  id: Date.now(),
+  id:
+    Date.now(),
 
   nome:
     String(
@@ -521,7 +481,6 @@ const paciente = {
 
 };
 
-
 if (!paciente.nome) {
 
   return res.status(400).json({
@@ -533,11 +492,17 @@ if (!paciente.nome) {
 
 }
 
+if (
+  !Array.isArray(db.pacientes)
+) {
+
+  db.pacientes = [];
+
+}
 
 db.pacientes.push(
   paciente
 );
-
 
 if (!writeDB(db)) {
 
@@ -550,10 +515,13 @@ if (!writeDB(db)) {
 
 }
 
+return res.status(201).json({
 
-return res.status(201).json(
+  sucesso: true,
+
   paciente
-);
+
+});
 ```
 
 } catch (error) {
@@ -563,7 +531,6 @@ console.error(
   "Erro no atendimento:",
   error.message
 );
-
 
 return res.status(500).json({
 
@@ -586,53 +553,59 @@ app.post("/triagem", (req, res) => {
 try {
 
 ```
-const db =
-  readDB();
-
+const db = readDB();
 
 let risco =
-  req.body?.risco;
-
+  String(
+    req.body?.risco || ""
+  )
+    .trim()
+    .toLowerCase();
 
 const temperatura =
   Number(
     req.body?.temperatura
   );
 
-
+// Classificação automática pela temperatura
 if (
-  !Number.isNaN(temperatura)
-  &&
+  !Number.isNaN(temperatura) &&
   temperatura >= 39
 ) {
 
-  risco =
-    "vermelho";
+  risco = "vermelho";
 
-}
-
-else if (
-  !Number.isNaN(temperatura)
-  &&
+} else if (
+  !Number.isNaN(temperatura) &&
   temperatura >= 38
 ) {
 
-  risco =
-    "amarelo";
+  risco = "amarelo";
+
+} else if (!risco) {
+
+  risco = "verde";
 
 }
 
-else if (!risco) {
+const riscosPermitidos = [
+  "verde",
+  "amarelo",
+  "vermelho"
+];
 
-  risco =
-    "verde";
+if (
+  !riscosPermitidos.includes(risco)
+) {
+
+  risco = "verde";
 
 }
-
 
 const triagem = {
 
-  id: Date.now(),
+  id:
+    Date.now(),
 
   nome:
     String(
@@ -641,11 +614,15 @@ const triagem = {
 
   sintoma:
     String(
-      req.body?.sintoma || ""
+      req.body?.sintoma ||
+      req.body?.sintomas ||
+      ""
     ).trim(),
 
   temperatura:
-    req.body?.temperatura || "",
+    req.body?.temperatura ??
+    req.body?.temp ??
+    "",
 
   alergia:
     String(
@@ -654,10 +631,13 @@ const triagem = {
 
   observacao:
     String(
-      req.body?.observacao || ""
+      req.body?.observacao ||
+      ""
     ).trim(),
 
-  risco,
+  risco:
+
+    risco,
 
   status:
     "aguardando_medico",
@@ -666,7 +646,6 @@ const triagem = {
     new Date().toISOString()
 
 };
-
 
 if (!triagem.nome) {
 
@@ -679,11 +658,17 @@ if (!triagem.nome) {
 
 }
 
+if (
+  !Array.isArray(db.triagens)
+) {
+
+  db.triagens = [];
+
+}
 
 db.triagens.push(
   triagem
 );
-
 
 if (!writeDB(db)) {
 
@@ -696,10 +681,13 @@ if (!writeDB(db)) {
 
 }
 
+return res.status(201).json({
 
-return res.status(201).json(
+  sucesso: true,
+
   triagem
-);
+
+});
 ```
 
 } catch (error) {
@@ -709,7 +697,6 @@ console.error(
   "Erro na triagem:",
   error.message
 );
-
 
 return res.status(500).json({
 
@@ -732,9 +719,7 @@ app.get("/triagens", (req, res) => {
 try {
 
 ```
-const db =
-  readDB();
-
+const db = readDB();
 
 return res.status(200).json(
   db.triagens || []
@@ -748,7 +733,6 @@ console.error(
   "Erro ao listar triagens:",
   error.message
 );
-
 
 return res.status(500).json({
 
@@ -808,13 +792,12 @@ app.post("/consulta", (req, res) => {
 try {
 
 ```
-const db =
-  readDB();
-
+const db = readDB();
 
 const consulta = {
 
-  id: Date.now(),
+  id:
+    Date.now(),
 
   paciente:
     String(
@@ -841,7 +824,6 @@ const consulta = {
 
 };
 
-
 if (!consulta.paciente) {
 
   return res.status(400).json({
@@ -853,11 +835,17 @@ if (!consulta.paciente) {
 
 }
 
+if (
+  !Array.isArray(db.consultas)
+) {
+
+  db.consultas = [];
+
+}
 
 db.consultas.push(
   consulta
 );
-
 
 if (!writeDB(db)) {
 
@@ -870,10 +858,13 @@ if (!writeDB(db)) {
 
 }
 
+return res.status(201).json({
 
-return res.status(201).json(
+  sucesso: true,
+
   consulta
-);
+
+});
 ```
 
 } catch (error) {
@@ -883,7 +874,6 @@ console.error(
   "Erro na consulta:",
   error.message
 );
-
 
 return res.status(500).json({
 
@@ -898,7 +888,7 @@ return res.status(500).json({
 });
 
 // =====================================================
-// MEDICAÇÕES / CONSULTAS
+// LISTAR CONSULTAS
 // =====================================================
 
 app.get("/medicacoes", (req, res) => {
@@ -906,9 +896,7 @@ app.get("/medicacoes", (req, res) => {
 try {
 
 ```
-const db =
-  readDB();
-
+const db = readDB();
 
 return res.status(200).json(
   db.consultas || []
@@ -923,7 +911,6 @@ console.error(
   error.message
 );
 
-
 return res.status(500).json({
 
   erro:
@@ -937,7 +924,280 @@ return res.status(500).json({
 });
 
 // =====================================================
-// ERRO 404
+// TV - CHAMAR PACIENTE
+// =====================================================
+
+app.post("/tv/chamar", (req, res) => {
+
+try {
+
+```
+const db = readDB();
+
+const paciente =
+  String(
+    req.body?.paciente || ""
+  ).trim();
+
+const localTipo =
+  String(
+    req.body?.localTipo ||
+    "CONSULTÓRIO"
+  ).trim();
+
+const localNumero =
+  String(
+    req.body?.localNumero ||
+    "01"
+  ).trim();
+
+if (!paciente) {
+
+  return res.status(400).json({
+
+    erro:
+      "O nome do paciente é obrigatório."
+
+  });
+
+}
+
+const chamada = {
+
+  id:
+    Date.now(),
+
+  localTipo:
+    localTipo.toUpperCase(),
+
+  localNumero:
+    localNumero,
+
+  paciente:
+    paciente,
+
+  hora:
+    new Date().toLocaleTimeString(
+      "pt-BR",
+      {
+        hour: "2-digit",
+        minute: "2-digit"
+      }
+    ),
+
+  createdAt:
+    new Date().toISOString()
+
+};
+
+db.tv_chamada =
+  chamada;
+
+if (
+  !Array.isArray(
+    db.tv_historico
+  )
+) {
+
+  db.tv_historico = [];
+
+}
+
+db.tv_historico.unshift(
+  chamada
+);
+
+// Mantém somente as últimas 100 chamadas
+if (
+  db.tv_historico.length > 100
+) {
+
+  db.tv_historico =
+    db.tv_historico.slice(
+      0,
+      100
+    );
+
+}
+
+if (!writeDB(db)) {
+
+  return res.status(500).json({
+
+    erro:
+      "Não foi possível registrar a chamada."
+
+  });
+
+}
+
+return res.status(201).json({
+
+  sucesso: true,
+
+  chamada
+
+});
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao chamar paciente na TV:",
+  error.message
+);
+
+return res.status(500).json({
+
+  erro:
+    "Erro interno ao realizar a chamada."
+
+});
+```
+
+}
+
+});
+
+// =====================================================
+// TV - CHAMADA ATUAL
+// =====================================================
+
+app.get("/tv/atual", (req, res) => {
+
+try {
+
+```
+const db = readDB();
+
+return res.status(200).json({
+
+  sucesso: true,
+
+  chamada:
+    db.tv_chamada || null
+
+});
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao carregar chamada atual:",
+  error.message
+);
+
+return res.status(500).json({
+
+  erro:
+    "Não foi possível carregar a chamada atual."
+
+});
+```
+
+}
+
+});
+
+// =====================================================
+// TV - HISTÓRICO
+// =====================================================
+
+app.get("/tv/historico", (req, res) => {
+
+try {
+
+```
+const db = readDB();
+
+return res.status(200).json({
+
+  sucesso: true,
+
+  historico:
+    db.tv_historico || []
+
+});
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao carregar histórico da TV:",
+  error.message
+);
+
+return res.status(500).json({
+
+  erro:
+    "Não foi possível carregar o histórico."
+
+});
+```
+
+}
+
+});
+
+// =====================================================
+// TV - LIMPAR CHAMADA ATUAL
+// =====================================================
+
+app.post("/tv/limpar", (req, res) => {
+
+try {
+
+```
+const db = readDB();
+
+db.tv_chamada = null;
+
+if (!writeDB(db)) {
+
+  return res.status(500).json({
+
+    erro:
+      "Não foi possível limpar a chamada."
+
+  });
+
+}
+
+return res.status(200).json({
+
+  sucesso: true,
+
+  mensagem:
+    "Chamada atual removida."
+
+});
+```
+
+} catch (error) {
+
+```
+console.error(
+  "Erro ao limpar chamada:",
+  error.message
+);
+
+return res.status(500).json({
+
+  erro:
+    "Erro interno ao limpar chamada."
+
+});
+```
+
+}
+
+});
+
+// =====================================================
+// 404
 // =====================================================
 
 app.use((req, res) => {
@@ -974,13 +1234,13 @@ console.error(
   error
 );
 
-
-if (res.headersSent) {
+if (
+  res.headersSent
+) {
 
   return next(error);
 
 }
-
 
 res.status(500).json({
 
