@@ -457,6 +457,10 @@ const paciente = {
   id:
     Date.now(),
 
+  // =============================
+  // DADOS PRINCIPAIS
+  // =============================
+
   nome:
     String(
       req.body?.nome || ""
@@ -467,23 +471,85 @@ const paciente = {
       req.body?.cpf || ""
     ).trim(),
 
+  dataNascimento:
+    String(
+      req.body?.dataNascimento || ""
+    ).trim(),
+
+  sexo:
+    String(
+      req.body?.sexo || ""
+    ).trim(),
+
+  nomeMae:
+    String(
+      req.body?.nomeMae || ""
+    ).trim(),
+
+  estadoCivil:
+    String(
+      req.body?.estadoCivil || ""
+    ).trim(),
+
+  // =============================
+  // CONTATO / ENDEREÇO
+  // =============================
+
+  endereco:
+    String(
+      req.body?.endereco || ""
+    ).trim(),
+
+  telefone:
+    String(
+      req.body?.telefone || ""
+    ).trim(),
+
+  email:
+    String(
+      req.body?.email || ""
+    ).trim(),
+
+  contatoEmergencia:
+    String(
+      req.body?.contatoEmergencia || ""
+    ).trim(),
+
+  // =============================
+  // TIPO DE ATENDIMENTO
+  // =============================
+
   tipo:
     String(
       req.body?.tipo ||
       "Particular"
     ).trim(),
 
+  // =============================
+  // STATUS
+  // =============================
+
   status:
     "triagem",
+
+  // =============================
+  // DATA DO CADASTRO
+  // =============================
 
   createdAt:
     new Date().toISOString()
 
 };
 
+// =============================
+// VALIDAÇÃO
+// =============================
+
 if (!paciente.nome) {
 
   return res.status(400).json({
+
+    sucesso: false,
 
     erro:
       "O nome do paciente é obrigatório."
@@ -492,21 +558,37 @@ if (!paciente.nome) {
 
 }
 
+// =============================
+// GARANTIR ARRAY DE PACIENTES
+// =============================
+
 if (
-  !Array.isArray(db.pacientes)
+  !Array.isArray(
+    db.pacientes
+  )
 ) {
 
   db.pacientes = [];
 
 }
 
+// =============================
+// SALVAR PACIENTE
+// =============================
+
 db.pacientes.push(
   paciente
 );
 
+// =============================
+// SALVAR BANCO
+// =============================
+
 if (!writeDB(db)) {
 
   return res.status(500).json({
+
+    sucesso: false,
 
     erro:
       "Não foi possível salvar o paciente."
@@ -515,9 +597,16 @@ if (!writeDB(db)) {
 
 }
 
+// =============================
+// RESPOSTA
+// =============================
+
 return res.status(201).json({
 
   sucesso: true,
+
+  mensagem:
+    "Paciente cadastrado com sucesso.",
 
   paciente
 
@@ -533,6 +622,8 @@ console.error(
 );
 
 return res.status(500).json({
+
+  sucesso: false,
 
   erro:
     "Erro interno no servidor."
