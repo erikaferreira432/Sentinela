@@ -1,111 +1,1005 @@
-<script>
+<!DOCTYPE html>
 
-async function login() {
+<html lang="pt-BR">
 
-  const usuario =
-    document.getElementById("usuario")
-      .value
-      .trim();
+<head>
+  <meta charset="UTF-8">
 
-  const senha =
-    document.getElementById("senha")
-      .value
-      .trim();
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
+>
+
+<meta
+name="description"
+content="Sentinela - Sistema de Gestão e Atendimento Médico"
+
+>
+
+  <title>Sentinela | Acesso ao Sistema</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #1769aa;
+      --primary-dark: #0d4f82;
+      --secondary: #16a085;
+      --background: #f4f8fb;
+      --white: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #dbe4ec;
+      --danger: #dc3545;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family:
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Arial,
+        sans-serif;
+
+      background:
+        linear-gradient(
+          135deg,
+          #eaf4fb 0%,
+          #f7fbfd 45%,
+          #e8f5f2 100%
+        );
+
+      color: var(--text);
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 24px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1080px;
+      min-height: 650px;
+
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+
+      background: var(--white);
+
+      border-radius: 28px;
+
+      overflow: hidden;
+
+      box-shadow:
+        0 25px 70px rgba(23, 62, 89, 0.15);
+
+      border: 1px solid rgba(255, 255, 255, 0.8);
+    }
+
+    /* =========================================
+       LADO ESQUERDO
+    ========================================= */
+
+    .brand-panel {
+      position: relative;
+
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      padding: 60px;
+
+      color: white;
+
+      background:
+        linear-gradient(
+          145deg,
+          #1769aa,
+          #0e5a91 55%,
+          #087f78
+        );
+
+      overflow: hidden;
+    }
+
+    .brand-panel::before,
+    .brand-panel::after {
+      content: "";
+
+      position: absolute;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .brand-panel::before {
+      width: 360px;
+      height: 360px;
+
+      right: -170px;
+      top: -150px;
+    }
+
+    .brand-panel::after {
+      width: 280px;
+      height: 280px;
+
+      left: -140px;
+      bottom: -130px;
+    }
+
+    .brand-content {
+      position: relative;
+      z-index: 2;
+    }
+
+    .logo {
+      width: 76px;
+      height: 76px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      margin-bottom: 28px;
+
+      border-radius: 22px;
+
+      background: rgba(255, 255, 255, 0.16);
+
+      border: 1px solid rgba(255, 255, 255, 0.25);
+
+      backdrop-filter: blur(8px);
+
+      font-size: 38px;
+
+      box-shadow:
+        0 12px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .brand-panel h1 {
+      font-size: clamp(42px, 5vw, 64px);
+
+      line-height: 1;
+
+      letter-spacing: -2px;
+
+      margin-bottom: 20px;
+    }
+
+    .brand-panel h1 span {
+      font-weight: 300;
+    }
+
+    .brand-description {
+      max-width: 460px;
+
+      color: rgba(255, 255, 255, 0.84);
+
+      font-size: 17px;
+
+      line-height: 1.7;
+
+      margin-bottom: 38px;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+
+      gap: 13px;
+
+      color: rgba(255, 255, 255, 0.92);
+
+      font-size: 14px;
+    }
+
+    .feature-icon {
+      width: 30px;
+      height: 30px;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border-radius: 50%;
+
+      background: rgba(255, 255, 255, 0.14);
+
+      font-size: 14px;
+    }
+
+    /* =========================================
+       LADO DIREITO
+    ========================================= */
+
+    .login-panel {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 55px;
+    }
+
+    .login-container {
+      width: 100%;
+      max-width: 390px;
+    }
+
+    .login-header {
+      margin-bottom: 35px;
+    }
+
+    .login-header h2 {
+      font-size: 30px;
+
+      letter-spacing: -0.7px;
+
+      margin-bottom: 9px;
+    }
+
+    .login-header p {
+      color: var(--muted);
+
+      font-size: 14px;
+
+      line-height: 1.6;
+    }
+
+    /* =========================================
+       FORMULÁRIO
+    ========================================= */
+
+    .form-group {
+      margin-bottom: 21px;
+    }
+
+    .form-group label {
+      display: block;
+
+      margin-bottom: 8px;
+
+      font-size: 13px;
+
+      font-weight: 600;
+
+      color: #374151;
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+
+      left: 15px;
+      top: 50%;
+
+      transform: translateY(-50%);
+
+      font-size: 17px;
+
+      opacity: 0.65;
+
+      pointer-events: none;
+    }
+
+    .input-wrapper input {
+      width: 100%;
+
+      height: 52px;
+
+      padding:
+        0 16px 0 46px;
+
+      border: 1px solid var(--border);
+
+      border-radius: 12px;
+
+      outline: none;
+
+      font-size: 15px;
+
+      color: var(--text);
+
+      background: #fbfdff;
+
+      transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+    }
+
+    .input-wrapper input:hover {
+      border-color: #b9cbd9;
+    }
+
+    .input-wrapper input:focus {
+      background: white;
+
+      border-color: var(--primary);
+
+      box-shadow:
+        0 0 0 4px rgba(23, 105, 170, 0.10);
+    }
+
+    .input-wrapper input::placeholder {
+      color: #a0a9b3;
+    }
+
+    /* =========================================
+       BOTÃO
+    ========================================= */
+
+    .login-button {
+      width: 100%;
+
+      height: 53px;
+
+      margin-top: 5px;
+
+      border: none;
+
+      border-radius: 12px;
+
+      background:
+        linear-gradient(
+          135deg,
+          var(--primary),
+          var(--primary-dark)
+        );
+
+      color: white;
+
+      font-size: 15px;
+
+      font-weight: 700;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+
+      box-shadow:
+        0 9px 22px rgba(23, 105, 170, 0.20);
+    }
+
+    .login-button:hover {
+      transform: translateY(-1px);
+
+      box-shadow:
+        0 13px 28px rgba(23, 105, 170, 0.27);
+    }
+
+    .login-button:active {
+      transform: translateY(0);
+    }
+
+    .login-button:disabled {
+      cursor: not-allowed;
+
+      opacity: 0.7;
+
+      transform: none;
+    }
+
+    .button-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      gap: 9px;
+    }
+
+    /* =========================================
+       STATUS
+    ========================================= */
+
+    .status-message {
+      display: none;
+
+      margin-top: 18px;
+
+      padding: 13px 15px;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+
+      line-height: 1.5;
+    }
+
+    .status-message.error {
+      display: block;
+
+      background: #fff1f2;
+
+      border: 1px solid #fecdd3;
+
+      color: #be123c;
+    }
+
+    .status-message.success {
+      display: block;
+
+      background: #ecfdf5;
+
+      border: 1px solid #a7f3d0;
+
+      color: #047857;
+    }
+
+    /* =========================================
+       RODAPÉ
+    ========================================= */
+
+    .login-footer {
+      margin-top: 30px;
+
+      padding-top: 22px;
+
+      border-top: 1px solid #edf1f4;
+
+      text-align: center;
+
+      color: #9aa3ad;
+
+      font-size: 12px;
+
+      line-height: 1.6;
+    }
+
+    .security {
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      gap: 6px;
+
+      margin-top: 8px;
+
+      color: #7d8792;
+    }
+
+    /* =========================================
+       LOADING
+    ========================================= */
+
+    .spinner {
+      width: 17px;
+      height: 17px;
+
+      border-radius: 50%;
+
+      border: 2px solid rgba(255, 255, 255, 0.35);
+
+      border-top-color: white;
+
+      animation:
+        spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* =========================================
+       RESPONSIVO
+    ========================================= */
+
+    @media (max-width: 820px) {
+
+      body {
+        padding: 15px;
+      }
+
+      .page {
+        grid-template-columns: 1fr;
+
+        min-height: auto;
+
+        max-width: 520px;
+      }
+
+      .brand-panel {
+        padding: 38px 32px;
+
+        min-height: 330px;
+      }
+
+      .brand-panel h1 {
+        font-size: 46px;
+      }
+
+      .brand-description {
+        font-size: 15px;
+
+        margin-bottom: 25px;
+      }
+
+      .features {
+        display: none;
+      }
+
+      .login-panel {
+        padding: 40px 30px;
+      }
+    }
+
+    @media (max-width: 480px) {
+
+      body {
+        padding: 0;
+      }
+
+      .page {
+        min-height: 100vh;
+
+        border-radius: 0;
+
+        border: none;
+
+        box-shadow: none;
+      }
+
+      .brand-panel {
+        min-height: 280px;
+
+        padding: 35px 25px;
+      }
+
+      .brand-panel h1 {
+        font-size: 42px;
+      }
+
+      .login-panel {
+        padding: 35px 25px;
+      }
+
+      .login-header h2 {
+        font-size: 27px;
+      }
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <main class="page">
+
+```
+<!-- =====================================
+     PAINEL INSTITUCIONAL
+====================================== -->
+
+<section class="brand-panel">
+
+  <div class="brand-content">
+
+    <div class="logo">
+      🩺
+    </div>
+
+    <h1>
+      Sentinela
+    </h1>
+
+    <p class="brand-description">
+      Sistema integrado para gerenciamento,
+      atendimento e acompanhamento de pacientes.
+    </p>
+
+    <div class="features">
+
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        Atendimento organizado
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        Triagem e classificação
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        Painel médico integrado
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">✓</span>
+        Controle da fila de atendimento
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
 
 
-  if (!usuario || !senha) {
+<!-- =====================================
+     LOGIN
+====================================== -->
 
-    alert(
-      "Digite a identificação e o código de acesso."
-    );
+<section class="login-panel">
 
-    return;
-  }
+  <div class="login-container">
 
+    <div class="login-header">
 
-  try {
+      <h2>
+        Acesso ao sistema
+      </h2>
 
-    const resposta =
-      await fetch("/login", {
+      <p>
+        Informe sua identificação e seu
+        código de acesso para continuar.
+      </p>
 
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-          usuario: usuario,
-
-          senha: senha
-
-        })
-
-      });
+    </div>
 
 
-    const data =
-      await resposta.json();
+    <form
+      id="loginForm"
+      onsubmit="login(event)"
+    >
+
+      <div class="form-group">
+
+        <label for="usuario">
+          Identificação
+        </label>
+
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            👤
+          </span>
+
+          <input
+            type="text"
+            id="usuario"
+            name="usuario"
+            placeholder="Digite sua identificação"
+            autocomplete="username"
+            required
+          >
+
+        </div>
+
+      </div>
 
 
-    if (!resposta.ok) {
+      <div class="form-group">
 
-      alert(
-        data.erro ||
-        "Identificação ou código de acesso inválido."
-      );
+        <label for="senha">
+          Código de acesso
+        </label>
 
-      return;
+        <div class="input-wrapper">
+
+          <span class="input-icon">
+            🔐
+          </span>
+
+          <input
+            type="password"
+            id="senha"
+            name="senha"
+            placeholder="Digite seu código de acesso"
+            autocomplete="current-password"
+            required
+          >
+
+        </div>
+
+      </div>
+
+
+      <button
+        type="submit"
+        class="login-button"
+        id="loginButton"
+      >
+
+        <span
+          class="button-content"
+          id="buttonContent"
+        >
+          Entrar no sistema
+          <span>→</span>
+        </span>
+
+      </button>
+
+    </form>
+
+
+    <div
+      id="statusMessage"
+      class="status-message"
+    ></div>
+
+
+    <div class="login-footer">
+
+      <div>
+        Sentinela • Sistema de Atendimento Médico
+      </div>
+
+      <div class="security">
+        🔒 Acesso protegido
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+```
+
+  </main>
+
+  <script>
+
+    async function login(event) {
+
+      if (event) {
+        event.preventDefault();
+      }
+
+
+      const usuario =
+        document
+          .getElementById("usuario")
+          .value
+          .trim();
+
+
+      const senha =
+        document
+          .getElementById("senha")
+          .value
+          .trim();
+
+
+      const button =
+        document.getElementById("loginButton");
+
+
+      const buttonContent =
+        document.getElementById("buttonContent");
+
+
+      const status =
+        document.getElementById("statusMessage");
+
+
+      /*
+       * Validação
+       */
+
+      if (!usuario || !senha) {
+
+        mostrarErro(
+          "Digite a identificação e o código de acesso."
+        );
+
+        return;
+      }
+
+
+      /*
+       * Estado de carregamento
+       */
+
+      button.disabled = true;
+
+      buttonContent.innerHTML = `
+        <span class="spinner"></span>
+        Verificando acesso...
+      `;
+
+      status.className =
+        "status-message";
+
+      status.textContent = "";
+
+
+      try {
+
+        const resposta =
+          await fetch(
+            "/login",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+                usuario: usuario,
+                senha: senha
+              })
+            }
+          );
+
+
+        /*
+         * Evita erro caso o servidor
+         * retorne algo que não seja JSON.
+         */
+
+        let data;
+
+        try {
+
+          data =
+            await resposta.json();
+
+        } catch {
+
+          data = {};
+
+        }
+
+
+        /*
+         * Login inválido
+         */
+
+        if (!resposta.ok) {
+
+          mostrarErro(
+            data.erro ||
+            "Identificação ou código de acesso inválido."
+          );
+
+          restaurarBotao();
+
+          return;
+        }
+
+
+        /*
+         * Redirecionamento
+         */
+
+        if (data.tipo === "triagem") {
+
+          window.location.href =
+            "/triagem.html";
+
+          return;
+        }
+
+
+        if (data.tipo === "medico") {
+
+          window.location.href =
+            "/medico.html";
+
+          return;
+        }
+
+
+        if (data.tipo === "atendimento") {
+
+          window.location.href =
+            "/atendimento.html";
+
+          return;
+        }
+
+
+        /*
+         * Tipo desconhecido
+         */
+
+        mostrarErro(
+          "Tipo de usuário não reconhecido."
+        );
+
+        restaurarBotao();
+
+
+      } catch (error) {
+
+        console.error(
+          "Erro no login:",
+          error
+        );
+
+
+        mostrarErro(
+          "Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente."
+        );
+
+
+        restaurarBotao();
+
+      }
+
     }
 
 
-    if (data.tipo === "triagem") {
+    /*
+     * Mostrar erro
+     */
 
-      window.location.href =
-        "triagem.html";
+    function mostrarErro(mensagem) {
 
-      return;
+      const status =
+        document.getElementById(
+          "statusMessage"
+        );
+
+      status.textContent =
+        mensagem;
+
+      status.className =
+        "status-message error";
+
     }
 
 
-    if (data.tipo === "medico") {
+    /*
+     * Restaurar botão
+     */
 
-      window.location.href =
-        "medico.html";
+    function restaurarBotao() {
 
-      return;
+      const button =
+        document.getElementById(
+          "loginButton"
+        );
+
+      const buttonContent =
+        document.getElementById(
+          "buttonContent"
+        );
+
+
+      button.disabled = false;
+
+
+      buttonContent.innerHTML = `
+        Entrar no sistema
+        <span>→</span>
+      `;
+
     }
 
+  </script>
 
-    if (data.tipo === "atendimento") {
+</body>
 
-      window.location.href =
-        "atendimento.html";
-
-      return;
-    }
-
-
-    alert(
-      "Tipo de usuário não reconhecido."
-    );
-
-
-  } catch (error) {
-
-    console.error(
-      "Erro no login:",
-      error
-    );
-
-
-    alert(
-      "Não foi possível conectar ao servidor."
-    );
-
-  }
-
-}
-
-</script>
+</html>
