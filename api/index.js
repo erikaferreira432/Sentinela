@@ -634,7 +634,6 @@ return res.status(500).json({
 }
 
 });
-
 // =====================================================
 // TRIAGEM
 // =====================================================
@@ -646,6 +645,109 @@ try {
 ```
 const db = readDB();
 
+// ===================================================
+// DADOS RECEBIDOS
+// ===================================================
+
+const pacienteId =
+  req.body?.pacienteId;
+
+const nome =
+  String(
+    req.body?.nome || ""
+  ).trim();
+
+const sintoma =
+  String(
+    req.body?.sintoma ||
+    req.body?.sintomas ||
+    ""
+  ).trim();
+
+const alergia =
+  String(
+    req.body?.alergia || ""
+  ).trim();
+
+const observacao =
+  String(
+    req.body?.observacao || ""
+  ).trim();
+
+// ===================================================
+// TEMPERATURA
+// ===================================================
+
+const temperaturaRecebida =
+  req.body?.temperatura ??
+  req.body?.temp ??
+  "";
+
+const temperatura =
+  temperaturaRecebida === "" ||
+  temperaturaRecebida === null ||
+  temperaturaRecebida === undefined
+    ? null
+    : Number(
+        temperaturaRecebida
+      );
+
+// ===================================================
+// VALIDAÇÕES
+// ===================================================
+
+if (!nome) {
+
+  return res.status(400).json({
+
+    sucesso: false,
+
+    erro:
+      "O nome do paciente é obrigatório."
+
+  });
+
+}
+
+if (!sintoma) {
+
+  return res.status(400).json({
+
+    sucesso: false,
+
+    erro:
+      "O sintoma principal é obrigatório."
+
+  });
+
+}
+
+if (
+  temperatura !== null &&
+  (
+    Number.isNaN(
+      temperatura
+    ) ||
+    temperatura < 30 ||
+    temperatura > 45
+  )
+) {
+
+  return res.status(400).json({
+
+    sucesso: false,
+
+    erro:
+      "A temperatura informada é inválida."
+
+  });
+
+}
+
+// ===================================================
+// CLASSIFICAÇÃO DE RISCO
+// ===================================================
+
 let risco =
   String(
     req.body?.risco || ""
@@ -653,81 +755,216 @@ let risco =
     .trim()
     .toLowerCase();
 
-const temperatura =
-  Number(
-    req.body?.temperatura
-  );
+const vermelhos = [
 
-// Classificação automática pela temperatura
+  "infarto",
+
+  "avc",
+
+  "convulsao",
+
+  "hemorragia",
+
+  "falta_ar_grave"
+
+];
+
+const amarelos = [
+
+  "febre",
+
+  "vomito",
+
+  "diarreia",
+
+  "falta_ar_moderada"
+
+];
+
+// Temperatura crítica
 if (
-  !Number.isNaN(temperatura) &&
+  temperatura !== null &&
   temperatura >= 39
 ) {
 
-  risco = "vermelho";
+  risco =
+    "vermelho";
 
-} else if (
-  !Number.isNaN(temperatura) &&
+}
+
+// Sintomas de maior prioridade
+else if (
+  vermelhos.includes(
+    sintoma
+  )
+) {
+
+  risco =
+    "vermelho";
+
+}
+
+// Temperatura elevada
+else if (
+  temperatura !== null &&
   temperatura >= 38
 ) {
 
-  risco = "amarelo";
-
-} else if (!risco) {
-
-  risco = "verde";
+  risco =
+    "amarelo";
 
 }
 
+// Sintomas de atenção
+else if (
+  amarelos.includes(
+    sintoma
+  )
+) {
+
+  risco =
+    "amarelo";
+
+}
+
+// Caso não tenha classificação
+else {
+
+  risco =
+    "verde";
+
+}
+
+// Segurança adicional
 const riscosPermitidos = [
+
   "verde",
+
   "amarelo",
+
   "vermelho"
+
 ];
 
 if (
-  !riscosPermitidos.includes(risco)
+  !riscosPermitidos.includes(
+    risco
+  )
 ) {
 
-  risco = "verde";
+  risco =
+    "verde";
 
 }
+
+// ===================================================
+// LOCALIZAR PACIENTE
+// ===================================================
+
+let paciente = null;
+
+if (
+  Array.isArray(
+    db.pacientes
+  )
+) {
+
+  if (
+    pacienteId !==
+    undefined &&
+    pacienteId !== null &&
+    pacienteId !== ""
+  ) {
+
+    paciente =
+      db.pacientes.find(
+        (p) =>
+          String(p.id) ===
+          String(pacienteId)
+      );
+
+  }
+
+  // Compatibilidade:
+  // caso o frontend antigo não envie pacienteId
+  if (!paciente) {
+
+    paciente =
+      db.pacientes.find(
+        (p) =>
+          String(
+            p.nome || ""
+          )
+            .trim()
+            .toLowerCase() ===
+          nome
+            .trim()
+            .toLowerCase()
+      );
+
+  }
+
+}
+
+// ===================================================
+// VALIDAR PACIENTE
+// ===================================================
+
+if (!paciente) {
+
+  return res.status(404).json({
+
+    sucesso: false,
+
+    erro:
+      "Paciente não encontrado. Selecione um paciente da fila."
+
+  });
+
+}
+
+// ===================================================
+// ATUALIZAR STATUS DO PACIENTE
+// ===================================================
+
+paciente.status =
+  "aguardando_medico";
+
+paciente.triagemId =
+  Date.now();
+
+paciente.updatedAt =
+  new Date().toISOString();
+
+// ===================================================
+// CRIAR TRIAGEM
+// ===================================================
 
 const triagem = {
 
   id:
-    Date.now(),
+    paciente.triagemId,
+
+  pacienteId:
+    paciente.id,
 
   nome:
-    String(
-      req.body?.nome || ""
-    ).trim(),
+    paciente.nome ||
+    nome,
 
   sintoma:
-    String(
-      req.body?.sintoma ||
-      req.body?.sintomas ||
-      ""
-    ).trim(),
+    sintoma,
 
   temperatura:
-    req.body?.temperatura ??
-    req.body?.temp ??
-    "",
+    temperatura,
 
   alergia:
-    String(
-      req.body?.alergia || ""
-    ).trim(),
+    alergia,
 
   observacao:
-    String(
-      req.body?.observacao ||
-      ""
-    ).trim(),
+    observacao,
 
   risco:
-
     risco,
 
   status:
@@ -738,32 +975,39 @@ const triagem = {
 
 };
 
-if (!triagem.nome) {
-
-  return res.status(400).json({
-
-    erro:
-      "O nome do paciente é obrigatório."
-
-  });
-
-}
+// ===================================================
+// GARANTIR ARRAY
+// ===================================================
 
 if (
-  !Array.isArray(db.triagens)
+  !Array.isArray(
+    db.triagens
+  )
 ) {
 
   db.triagens = [];
 
 }
 
+// ===================================================
+// SALVAR TRIAGEM
+// ===================================================
+
 db.triagens.push(
   triagem
 );
 
-if (!writeDB(db)) {
+// ===================================================
+// SALVAR BANCO
+// ===================================================
+
+if (
+  !writeDB(db)
+) {
 
   return res.status(500).json({
+
+    sucesso: false,
 
     erro:
       "Não foi possível salvar a triagem."
@@ -772,11 +1016,22 @@ if (!writeDB(db)) {
 
 }
 
+// ===================================================
+// RESPOSTA
+// ===================================================
+
 return res.status(201).json({
 
   sucesso: true,
 
-  triagem
+  mensagem:
+    "Triagem salva e paciente encaminhado ao médico.",
+
+  paciente:
+    paciente,
+
+  triagem:
+    triagem
 
 });
 ```
@@ -791,6 +1046,8 @@ console.error(
 
 return res.status(500).json({
 
+  sucesso: false,
+
   erro:
     "Erro interno no servidor."
 
@@ -800,6 +1057,7 @@ return res.status(500).json({
 }
 
 });
+
 
 // =====================================================
 // LISTAR TRIAGENS
