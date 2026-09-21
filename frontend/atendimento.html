@@ -1,45 +1,420 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="style.css"></head>
-<body>
-<div class="container">
-<h2>Atendimento</h2>  
- 
-<input id="nome" placeholder="Nome">
-<input id="cpf" placeholder="CPF">
-<input id="Data de nascimento" placeholder="Data de nascimento">
-<input id="Sexo" placeholder="Sexo">
-<input id="Nome da Mãe" placeholder="Nome da Mãe">
-<input id="Estado Civil" placeholder="Estado Civil">
-<input id="Endereço" placeholder="Endereço">
-<input id="Telefone" placeholder="Telefone">
-<input id="E-mail" placeholder="E-mail">
-<input id="Contato de Emergência" placeholder="Contato de Emergência">
 
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="UTF-8">
+
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0"
+
+>
+
+  <title>Sentinela | Atendimento</title>
+
+  <link
+    rel="stylesheet"
+    href="css/style.css"
+  >
+
+</head>
+
+<body>
+
+  <div class="container">
+
+```
+<h2>Atendimento</h2>
+
+<p>
+  Cadastro inicial do paciente
+</p>
+
+<!-- ============================= -->
+<!-- DADOS PRINCIPAIS -->
+<!-- ============================= -->
+
+<input
+  id="nome"
+  type="text"
+  placeholder="Nome completo"
+  autocomplete="name"
+  required
+>
+
+<input
+  id="cpf"
+  type="text"
+  placeholder="CPF"
+  autocomplete="off"
+>
+
+<input
+  id="dataNascimento"
+  type="date"
+  placeholder="Data de nascimento"
+>
+
+<input
+  id="sexo"
+  type="text"
+  placeholder="Sexo"
+>
+
+<input
+  id="nomeMae"
+  type="text"
+  placeholder="Nome da mãe"
+>
+
+<input
+  id="estadoCivil"
+  type="text"
+  placeholder="Estado civil"
+>
+
+<input
+  id="endereco"
+  type="text"
+  placeholder="Endereço"
+  autocomplete="street-address"
+>
+
+<input
+  id="telefone"
+  type="tel"
+  placeholder="Telefone"
+  autocomplete="tel"
+>
+
+<input
+  id="email"
+  type="email"
+  placeholder="E-mail"
+  autocomplete="email"
+>
+
+<input
+  id="contatoEmergencia"
+  type="text"
+  placeholder="Contato de emergência"
+>
+
+<!-- ============================= -->
+<!-- TIPO DE ATENDIMENTO -->
+<!-- ============================= -->
 
 <select id="tipo">
-  <option>Convenio</option>
-  <option>Particular</option>
+
+  <option value="Convenio">
+    Convênio
+  </option>
+
+  <option value="Particular">
+    Particular
+  </option>
+
 </select>
 
-<input type="file" id="foto">
+<!-- ============================= -->
+<!-- FOTO -->
+<!-- ============================= -->
 
-<button onclick="cadastrar()">Cadastrar</button>
-</div>
+<label for="foto">
+  Foto do paciente
+</label>
 
-<script>
-function cadastrar(){
- fetch("http://localhost:3000/atendimento",{
-  method:"POST",
-  headers:{"Content-Type":"application/json"},
-  body: JSON.stringify({
-    nome: nome.value,
-    cpf: cpf.value,
-    tipo: tipo.value
-  })
- });
- alert("Paciente enviado para triagem");
-}
-</script>
+<input
+  type="file"
+  id="foto"
+  accept="image/*"
+>
+
+<!-- ============================= -->
+<!-- BOTÃO -->
+<!-- ============================= -->
+
+<button
+  id="btnCadastrar"
+  type="button"
+  onclick="cadastrar()"
+>
+  Cadastrar
+</button>
+
+<p
+  id="mensagem"
+  style="display:none;"
+></p>
+```
+
+  </div>
+
+  <script>
+
+    async function cadastrar() {
+
+      const btn =
+        document.getElementById(
+          "btnCadastrar"
+        );
+
+      const mensagem =
+        document.getElementById(
+          "mensagem"
+        );
+
+      // =============================
+      // PEGAR DADOS
+      // =============================
+
+      const nome =
+        document
+          .getElementById("nome")
+          .value
+          .trim();
+
+      const cpf =
+        document
+          .getElementById("cpf")
+          .value
+          .trim();
+
+      const dataNascimento =
+        document
+          .getElementById("dataNascimento")
+          .value;
+
+      const sexo =
+        document
+          .getElementById("sexo")
+          .value
+          .trim();
+
+      const nomeMae =
+        document
+          .getElementById("nomeMae")
+          .value
+          .trim();
+
+      const estadoCivil =
+        document
+          .getElementById("estadoCivil")
+          .value
+          .trim();
+
+      const endereco =
+        document
+          .getElementById("endereco")
+          .value
+          .trim();
+
+      const telefone =
+        document
+          .getElementById("telefone")
+          .value
+          .trim();
+
+      const email =
+        document
+          .getElementById("email")
+          .value
+          .trim();
+
+      const contatoEmergencia =
+        document
+          .getElementById("contatoEmergencia")
+          .value
+          .trim();
+
+      const tipo =
+        document
+          .getElementById("tipo")
+          .value;
+
+      // =============================
+      // VALIDAÇÃO
+      // =============================
+
+      if (!nome) {
+
+        mensagem.style.display =
+          "block";
+
+        mensagem.textContent =
+          "Digite o nome completo do paciente.";
+
+        return;
+
+      }
+
+      // =============================
+      // ESTADO DO BOTÃO
+      // =============================
+
+      btn.disabled = true;
+
+      btn.textContent =
+        "Cadastrando...";
+
+      mensagem.style.display =
+        "none";
+
+      try {
+
+        // IMPORTANTE:
+        // URL relativa funciona localmente
+        // e também no Render.
+
+        const resposta =
+          await fetch(
+            "/atendimento",
+            {
+              method: "POST",
+
+              headers: {
+                "Content-Type":
+                  "application/json"
+              },
+
+              body: JSON.stringify({
+
+                nome:
+                  nome,
+
+                cpf:
+                  cpf,
+
+                dataNascimento:
+                  dataNascimento,
+
+                sexo:
+                  sexo,
+
+                nomeMae:
+                  nomeMae,
+
+                estadoCivil:
+                  estadoCivil,
+
+                endereco:
+                  endereco,
+
+                telefone:
+                  telefone,
+
+                email:
+                  email,
+
+                contatoEmergencia:
+                  contatoEmergencia,
+
+                tipo:
+                  tipo
+
+              })
+
+            }
+          );
+
+        // Tenta interpretar a resposta
+        const data =
+          await resposta.json()
+            .catch(() => null);
+
+        if (!resposta.ok) {
+
+          throw new Error(
+            data?.erro ||
+            "Não foi possível cadastrar o paciente."
+          );
+
+        }
+
+        // =============================
+        // SUCESSO
+        // =============================
+
+        mensagem.style.display =
+          "block";
+
+        mensagem.textContent =
+          "Paciente cadastrado com sucesso e enviado para a triagem.";
+
+        // Limpar campos
+        document
+          .getElementById("nome")
+          .value = "";
+
+        document
+          .getElementById("cpf")
+          .value = "";
+
+        document
+          .getElementById("dataNascimento")
+          .value = "";
+
+        document
+          .getElementById("sexo")
+          .value = "";
+
+        document
+          .getElementById("nomeMae")
+          .value = "";
+
+        document
+          .getElementById("estadoCivil")
+          .value = "";
+
+        document
+          .getElementById("endereco")
+          .value = "";
+
+        document
+          .getElementById("telefone")
+          .value = "";
+
+        document
+          .getElementById("email")
+          .value = "";
+
+        document
+          .getElementById("contatoEmergencia")
+          .value = "";
+
+        document
+          .getElementById("foto")
+          .value = "";
+
+      } catch (error) {
+
+        console.error(
+          "Erro no cadastro:",
+          error
+        );
+
+        mensagem.style.display =
+          "block";
+
+        mensagem.textContent =
+          error.message ||
+          "Não foi possível conectar ao servidor.";
+
+      } finally {
+
+        btn.disabled = false;
+
+        btn.textContent =
+          "Cadastrar";
+
+      }
+
+    }
+
+  </script>
+
 </body>
+
 </html>
